@@ -157,9 +157,6 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 	public function assertCanonical( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
 		$this->expected_doing_it_wrong = array_merge( $this->expected_doing_it_wrong, (array) $expected_doing_it_wrong );
 
-		if ( $ticket )
-			$this->knownWPBug( $ticket );
-
 		$ticket_ref = ($ticket > 0) ? 'Ticket #' . $ticket : null;
 
 		if ( is_string($expected) )
@@ -168,7 +165,7 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 			$expected = array( 'qv' => $expected );
 
 		if ( !isset($expected['url']) && !isset($expected['qv']) )
-			$this->markTestSkipped('No valid expected output was provided');
+			$this->fail( 'No valid expected output was provided' );
 
 		$this->go_to( home_url( $test_url ) );
 
@@ -181,6 +178,7 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 			$this->assertEquals( $expected['url'], $parsed_can_url['path'] . (!empty($parsed_can_url['query']) ? '?' . $parsed_can_url['query'] : ''), $ticket_ref );
 		}
 
+		// If the test data doesn't include expected query vars, then we're done here
 		if ( ! isset($expected['qv']) )
 			return;
 

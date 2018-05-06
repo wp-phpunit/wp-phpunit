@@ -17,7 +17,7 @@ class MockPHPMailer extends PHPMailer {
 			'to'      => $this->to,
 			'cc'      => $this->cc,
 			'bcc'     => $this->bcc,
-			'header'  => $this->MIMEHeader,
+			'header'  => $this->MIMEHeader . $this->mailHeader,
 			'subject' => $this->Subject,
 			'body'    => $this->MIMEBody,
 		);
@@ -83,4 +83,21 @@ function tests_retrieve_phpmailer_instance() {
 		$mailer = $GLOBALS['phpmailer'];
 	}
 	return $mailer;
+}
+
+/**
+ * Helper method to reset the phpmailer instance.
+ *
+ * @since 4.6.0
+ *
+ * @return bool
+ */
+function reset_phpmailer_instance() {
+	$mailer = tests_retrieve_phpmailer_instance();
+	if ( $mailer && isset( $mailer->mock_sent ) ) {
+		unset( $mailer->mock_sent );
+		return true;
+	}
+
+	return false;
 }

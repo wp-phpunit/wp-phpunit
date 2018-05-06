@@ -309,9 +309,11 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		}
 		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 		add_action( 'deprecated_argument_run', array( $this, 'deprecated_function_run' ) );
+		add_action( 'deprecated_hook_run', array( $this, 'deprecated_function_run' ) );
 		add_action( 'doing_it_wrong_run', array( $this, 'doing_it_wrong_run' ) );
 		add_action( 'deprecated_function_trigger_error', '__return_false' );
 		add_action( 'deprecated_argument_trigger_error', '__return_false' );
+		add_action( 'deprecated_hook_trigger_error',     '__return_false' );
 		add_action( 'doing_it_wrong_trigger_error',      '__return_false' );
 	}
 
@@ -412,6 +414,11 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $expected, $actual );
 	}
 
+	/**
+	 * Modify WordPress's query internals as if a given URL has been requested.
+	 *
+	 * @param string $url The URL for the request.
+	 */
 	function go_to( $url ) {
 		// note: the WP and WP_Query classes like to silently fetch parameters
 		// from all over the place (globals, GET, etc), which makes it tricky

@@ -302,27 +302,6 @@ function mask_input_value($in, $name='_wpnonce') {
 	return preg_replace('@<input([^>]*) name="'.preg_quote($name).'"([^>]*) value="[^>]*" />@', '<input$1 name="'.preg_quote($name).'"$2 value="***" />', $in);
 }
 
-$GLOBALS['_wp_die_disabled'] = false;
-function _wp_die_handler( $message, $title = '', $args = array() ) {
-	if ( !$GLOBALS['_wp_die_disabled'] ) {
-		_default_wp_die_handler( $message, $title, $args );
-	} else {
-		//Ignore at our peril
-	}
-}
-
-function _disable_wp_die() {
-	$GLOBALS['_wp_die_disabled'] = true;
-}
-
-function _enable_wp_die() {
-	$GLOBALS['_wp_die_disabled'] = false;
-}
-
-function _wp_die_handler_filter() {
-	return '_wp_die_handler';
-}
-
 if ( !function_exists( 'str_getcsv' ) ) {
 	function str_getcsv( $input, $delimiter = ',', $enclosure = '"', $escape = "\\" ) {
 		$fp = fopen( 'php://temp/', 'r+' );
@@ -331,18 +310,6 @@ if ( !function_exists( 'str_getcsv' ) ) {
 		$data = fgetcsv( $fp, strlen( $input ), $delimiter, $enclosure );
 		fclose( $fp );
 		return $data;
-	}
-}
-
-function _rmdir( $path ) {
-	if ( in_array(basename( $path ), array( '.', '..' ) ) ) {
-		return;
-	} elseif ( is_file( $path ) ) {
-		unlink( $path );
-	} elseif ( is_dir( $path ) ) {
-		foreach ( scandir( $path ) as $file )
-			_rmdir( $path . '/' . $file );
-		rmdir( $path );
 	}
 }
 

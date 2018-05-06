@@ -157,7 +157,7 @@ class testXMLParser {
 	}
 
 	function parse($in) {
-		$parse = xml_parse($this->xml, $in, sizeof($in));
+		$parse = xml_parse($this->xml, $in, true);
 		if (!$parse) {
 			trigger_error(sprintf("XML error: %s at line %d",
 			xml_error_string(xml_get_error_code($this->xml)),
@@ -389,6 +389,11 @@ class wpdb_exposed_methods_for_testing extends wpdb {
 		$this->ready = true;
 		$this->field_types = $wpdb->field_types;
 		$this->charset = $wpdb->charset;
+
+		$this->dbuser = $wpdb->dbuser;
+		$this->dbpassword = $wpdb->dbpassword;
+		$this->dbname = $wpdb->dbname;
+		$this->dbhost = $wpdb->dbhost;
 	}
 
 	public function __call( $name, $arguments ) {

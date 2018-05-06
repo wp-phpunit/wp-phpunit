@@ -415,6 +415,27 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		array_push( $this->expected_doing_it_wrong, $doing_it_wrong );
 	}
 
+	/**
+	 * PHPUnit 6+ compatibility shim.
+	 *
+	 * @param mixed      $exception
+	 * @param string     $message
+	 * @param int|string $code
+	 */
+	public function setExpectedException( $exception, $message = '', $code = null ) {
+		if ( method_exists( 'PHPUnit_Framework_TestCase', 'setExpectedException' ) ) {
+			parent::setExpectedException( $exception, $message, $code );
+		} else {
+			$this->expectException( $exception );
+			if ( '' !== $message ) {
+				$this->expectExceptionMessage( $message );
+			}
+			if ( null !== $code ) {
+				$this->expectExceptionCode( $code );
+			}
+		}
+	}
+
 	function deprecated_function_run( $function ) {
 		if ( ! in_array( $function, $this->caught_deprecated ) )
 			$this->caught_deprecated[] = $function;
@@ -534,10 +555,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( $tickets as $ticket ) {
 			if ( is_numeric( $ticket ) ) {
 				$this->knownWPBug( $ticket );
-			} elseif ( 'UT' == substr( $ticket, 0, 2 ) ) {
-				$ticket = substr( $ticket, 2 );
-				if ( $ticket && is_numeric( $ticket ) )
-					$this->knownUTBug( $ticket );
 			} elseif ( 'Plugin' == substr( $ticket, 0, 6 ) ) {
 				$ticket = substr( $ticket, 6 );
 				if ( $ticket && is_numeric( $ticket ) )
@@ -557,13 +574,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Skips the current test if there is an open unit tests ticket with id $ticket_id
+	 * @deprecated No longer used since the unit test Trac was merged into Core's.
 	 */
 	function knownUTBug( $ticket_id ) {
-		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'UT' . $ticket_id, self::$forced_tickets ) )
-			return;
-		if ( ! TracTickets::isTracTicketClosed( 'https://unit-tests.trac.wordpress.org', $ticket_id ) )
-			$this->markTestSkipped( sprintf( 'Unit Tests Ticket #%d is not fixed', $ticket_id ) );
+		return;
 	}
 
 	/**

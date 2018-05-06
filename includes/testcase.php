@@ -3,6 +3,15 @@
 require_once dirname( __FILE__ ) . '/factory.php';
 require_once dirname( __FILE__ ) . '/trac.php';
 
+/**
+ * Defines a basic fixture to run multiple tests.
+ *
+ * Resets the state of the WordPress installation before and after every test.
+ *
+ * Includes utility functions and assertions useful for testing WordPress.
+ *
+ * All WordPress unit tests should inherit from this class.
+ */
 class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	protected static $forced_tickets = array();
@@ -101,6 +110,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
 			$this->reset_post_statuses();
+			$this->reset__SERVER();
 
 			if ( $wp_rewrite->permalink_structure ) {
 				$this->set_permalink_structure( '' );
@@ -123,6 +133,9 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->expectedDeprecated();
 	}
 
+	/**
+	 * After a test method runs, reset any state in WordPress the test method might have changed.
+	 */
 	function tearDown() {
 		global $wpdb, $wp_query, $wp, $post;
 		$wpdb->query( 'ROLLBACK' );
@@ -183,6 +196,13 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( get_post_stati( array( '_builtin' => false ) ) as $post_status ) {
 			_unregister_post_status( $post_status );
 		}
+	}
+
+	/**
+	 * Reset `$_SERVER` variables
+	 */
+	protected function reset__SERVER() {
+		tests_reset__SERVER();
 	}
 
 	/**
@@ -272,6 +292,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function wp_die_handler( $message ) {
+		if ( ! is_scalar( $message ) ) {
+			$message = '0';
+		}
+
 		throw new WPDieException( $message );
 	}
 
@@ -537,7 +561,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			'is_author',
 			'is_category',
 			'is_comment_feed',
-			'is_comments_popup',
 			'is_date',
 			'is_day',
 			'is_embed',

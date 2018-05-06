@@ -16,16 +16,18 @@ class WP_XMLRPC_UnitTestCase extends WP_UnitTestCase {
 
 	function tearDown() {
 		remove_filter( 'pre_option_enable_xmlrpc', '__return_true' );
+
 		$this->remove_added_uploads();
 
 		parent::tearDown();
 	}
 
 	protected function make_user_by_role( $role ) {
-		return $this->factory->user->create( array(
+		return self::factory()->user->create( array(
 			'user_login' => $role,
 			'user_pass'  => $role,
 			'role'       => $role
 		));
 	}
+
 }

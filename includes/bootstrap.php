@@ -65,7 +65,10 @@ if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
 }
 $wp_theme_directories = array( DIR_TESTDATA . '/themedir1' );
 
-system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.php' ) . ' ' . escapeshellarg( $config_file_path ) . ' ' . $multisite );
+system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.php' ) . ' ' . escapeshellarg( $config_file_path ) . ' ' . $multisite, $retval );
+if ( 0 !== $retval ) {
+	exit( $retval );
+}
 
 if ( $multisite ) {
 	echo "Running as multisite..." . PHP_EOL;
@@ -132,7 +135,9 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 	function __construct( $argv ) {
 		array_shift( $argv );
 		$options = array();
-		while ( list( $i, $arg ) = each( $argv ) ) {
+		while ( current( $argv ) ) {
+			$arg = current( $argv );
+			next( $argv );
 			try {
 				if ( strlen( $arg ) > 1 && $arg[0] === '-' && $arg[1] === '-' ) {
 					PHPUnit_Util_Getopt::parseLongOption( substr( $arg, 2 ), $this->longOptions, $options, $argv );

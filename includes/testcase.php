@@ -177,6 +177,27 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Allow tests to be skipped on some automated runs
+	 *
+	 * For test runs on Travis for something other than trunk/master 
+	 * we want to skip tests that only need to run for master.
+	 */
+	public function skipOnAutomatedBranches() {
+		// gentenv can be disabled
+		if ( ! function_exists( 'getenv' ) ) {
+			return false;
+		}
+
+		// https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
+		$travis_branch       = getenv( 'TRAVIS_BRANCH' );
+		$travis_pull_request = getenv( 'TRAVIS_PULL_REQUEST' );
+
+		if ( false !== $travis_pull_request && 'master' !== $travis_branch ) {
+			$this->markTestSkipped( 'For automated test runs, this test is only run on trunk/master' );
+		}
+	}
+
+	/**
 	 * Unregister existing post types and register defaults.
 	 *
 	 * Run before each test in order to clean up the global scope, in case
@@ -394,6 +415,27 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		array_push( $this->expected_doing_it_wrong, $doing_it_wrong );
 	}
 
+	/**
+	 * PHPUnit 6+ compatibility shim.
+	 *
+	 * @param mixed      $exception
+	 * @param string     $message
+	 * @param int|string $code
+	 */
+	public function setExpectedException( $exception, $message = '', $code = null ) {
+		if ( method_exists( 'PHPUnit_Framework_TestCase', 'setExpectedException' ) ) {
+			parent::setExpectedException( $exception, $message, $code );
+		} else {
+			$this->expectException( $exception );
+			if ( '' !== $message ) {
+				$this->expectExceptionMessage( $message );
+			}
+			if ( null !== $code ) {
+				$this->expectExceptionCode( $code );
+			}
+		}
+	}
+
 	function deprecated_function_run( $function ) {
 		if ( ! in_array( $function, $this->caught_deprecated ) )
 			$this->caught_deprecated[] = $function;
@@ -437,6 +479,18 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		ksort( $expected );
 		ksort( $actual );
 		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
+	 * Asserts that a condition is not false.
+	 *
+	 * @param bool   $condition
+	 * @param string $message
+	 *
+	 * @throws PHPUnit_Framework_AssertionFailedError
+	 */
+	public static function assertNotFalse( $condition, $message = '' ) {
+		self::assertThat( $condition, self::logicalNot( self::isFalse() ), $message );
 	}
 
 	/**
@@ -501,10 +555,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( $tickets as $ticket ) {
 			if ( is_numeric( $ticket ) ) {
 				$this->knownWPBug( $ticket );
-			} elseif ( 'UT' == substr( $ticket, 0, 2 ) ) {
-				$ticket = substr( $ticket, 2 );
-				if ( $ticket && is_numeric( $ticket ) )
-					$this->knownUTBug( $ticket );
 			} elseif ( 'Plugin' == substr( $ticket, 0, 6 ) ) {
 				$ticket = substr( $ticket, 6 );
 				if ( $ticket && is_numeric( $ticket ) )
@@ -524,13 +574,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Skips the current test if there is an open unit tests ticket with id $ticket_id
+	 * @deprecated No longer used since the unit test Trac was merged into Core's.
 	 */
 	function knownUTBug( $ticket_id ) {
-		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'UT' . $ticket_id, self::$forced_tickets ) )
-			return;
-		if ( ! TracTickets::isTracTicketClosed( 'https://unit-tests.trac.wordpress.org', $ticket_id ) )
-			$this->markTestSkipped( sprintf( 'Unit Tests Ticket #%d is not fixed', $ticket_id ) );
+		return;
 	}
 
 	/**

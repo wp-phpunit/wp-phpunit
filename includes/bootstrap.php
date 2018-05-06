@@ -3,6 +3,12 @@
  * Installs WordPress for running the tests and loads WordPress and the test libraries
  */
 
+/**
+ * Compatibility with PHPUnit 6+
+ */
+if ( class_exists( 'PHPUnit\Runner\Version' ) ) {
+	require_once dirname( __FILE__ ) . '/phpunit6-compat.php';
+}
 
 $config_file_path = dirname( dirname( __FILE__ ) );
 if ( ! file_exists( $config_file_path . '/wp-tests-config.php' ) ) {
@@ -18,8 +24,9 @@ $config_file_path .= '/wp-tests-config.php';
  */
 global $wpdb, $current_site, $current_blog, $wp_rewrite, $shortcode_tags, $wp, $phpmailer, $wp_theme_directories;
 
-if ( !is_readable( $config_file_path ) ) {
-	die( "ERROR: wp-tests-config.php is missing! Please use wp-tests-config-sample.php to create a config file.\n" );
+if ( ! is_readable( $config_file_path ) ) {
+	echo "ERROR: wp-tests-config.php is missing! Please use wp-tests-config-sample.php to create a config file.\n";
+	exit( 1 );
 }
 require_once $config_file_path;
 require_once dirname( __FILE__ ) . '/functions.php';

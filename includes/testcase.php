@@ -32,10 +32,13 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function tearDown() {
-		global $wpdb;
+		global $wpdb, $wp_query, $post;
 		$this->expectedDeprecated();
 		$wpdb->query( 'ROLLBACK' );
-		remove_filter( 'dbdelta_create_queries', array( $this, '_create_temporary_tables' ) );
+		$wp_query = new WP_Query();
+		$post = null;
+		remove_theme_support( 'html5' );
+		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 	}
@@ -64,17 +67,19 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		global $wpdb;
 		$wpdb->query( 'SET autocommit = 0;' );
 		$wpdb->query( 'START TRANSACTION;' );
-		add_filter( 'dbdelta_create_queries', array( $this, '_create_temporary_tables' ) );
+		add_filter( 'query', array( $this, '_create_temporary_tables' ) );
 		add_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 	}
 
-	function _create_temporary_tables( $queries ) {
-		return str_replace( 'CREATE TABLE', 'CREATE TEMPORARY TABLE', $queries );
+	function _create_temporary_tables( $query ) {
+		if ( 'CREATE TABLE' === substr( trim( $query ), 0, 12 ) )
+			return substr_replace( trim( $query ), 'CREATE TEMPORARY TABLE', 0, 12 );
+		return $query;
 	}
 
 	function _drop_temporary_tables( $query ) {
-		if ( 'DROP TABLE' === substr( $query, 0, 10 ) )
-			return 'DROP TEMPORARY TABLE ' . substr( $query, 10 );
+		if ( 'DROP TABLE' === substr( trim( $query ), 0, 10 ) )
+			return substr_replace( trim( $query ), 'DROP TEMPORARY TABLE', 0, 10 );
 		return $query;
 	}
 
@@ -217,7 +222,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function knownWPBug( $ticket_id ) {
 		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( $ticket_id, self::$forced_tickets ) )
 			return;
-		if ( ! TracTickets::isTracTicketClosed( 'http://core.trac.wordpress.org', $ticket_id ) )
+		if ( ! TracTickets::isTracTicketClosed( 'https://core.trac.wordpress.org', $ticket_id ) )
 			$this->markTestSkipped( sprintf( 'WordPress Ticket #%d is not fixed', $ticket_id ) );
 	}
 
@@ -227,7 +232,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function knownUTBug( $ticket_id ) {
 		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'UT' . $ticket_id, self::$forced_tickets ) )
 			return;
-		if ( ! TracTickets::isTracTicketClosed( 'http://unit-tests.trac.wordpress.org', $ticket_id ) )
+		if ( ! TracTickets::isTracTicketClosed( 'https://unit-tests.trac.wordpress.org', $ticket_id ) )
 			$this->markTestSkipped( sprintf( 'Unit Tests Ticket #%d is not fixed', $ticket_id ) );
 	}
 
@@ -237,7 +242,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function knownPluginBug( $ticket_id ) {
 		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'Plugin' . $ticket_id, self::$forced_tickets ) )
 			return;
-		if ( ! TracTickets::isTracTicketClosed( 'http://plugins.trac.wordpress.org', $ticket_id ) )
+		if ( ! TracTickets::isTracTicketClosed( 'https://plugins.trac.wordpress.org', $ticket_id ) )
 			$this->markTestSkipped( sprintf( 'WordPress Plugin Ticket #%d is not fixed', $ticket_id ) );
 	}
 

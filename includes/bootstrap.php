@@ -23,6 +23,7 @@ if ( !is_readable( $config_file_path ) ) {
 }
 require_once $config_file_path;
 
+define( 'WP_TESTS_TABLE_PREFIX', $table_prefix );
 define( 'DIR_TESTDATA', dirname( __FILE__ ) . '/../data' );
 
 if ( ! defined( 'WP_TESTS_FORCE_KNOWN_BUGS' ) )
@@ -47,7 +48,7 @@ if ( "1" == getenv( 'WP_MULTISITE' ) ||
 
 // Override the PHPMailer
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
-$phpmailer = new MockPHPMailer(); 
+$phpmailer = new MockPHPMailer();
 
 system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.php' ) . ' ' . escapeshellarg( $config_file_path ) . ' ' . $multisite );
 
@@ -55,10 +56,6 @@ if ( $multisite ) {
 	echo "Running as multisite..." . PHP_EOL;
 	define( 'MULTISITE', true );
 	define( 'SUBDOMAIN_INSTALL', false );
-	define( 'DOMAIN_CURRENT_SITE', WP_TESTS_DOMAIN );
-	define( 'PATH_CURRENT_SITE', '/' );
-	define( 'SITE_ID_CURRENT_SITE', 1 );
-	define( 'BLOG_ID_CURRENT_SITE', 1 );
 	$GLOBALS['base'] = '/';
 } else {
 	echo "Running as single site... To run multisite, use -c tests/phpunit/multisite.xml" . PHP_EOL;
@@ -66,6 +63,10 @@ if ( $multisite ) {
 unset( $multisite );
 
 require_once dirname( __FILE__ ) . '/functions.php';
+
+$GLOBALS['_wp_die_disabled'] = false;
+// Allow tests to override wp_die
+tests_add_filter( 'wp_die_handler', '_wp_die_handler_filter' );
 
 // Preset WordPress options defined in bootstrap file.
 // Used to activate themes, plugins, as well as  other settings.

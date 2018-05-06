@@ -42,3 +42,64 @@ function _delete_all_posts() {
 	}
 }
 
+class Basic_Object {
+	private $foo = 'bar';
+
+	public function __get( $name ) {
+		return $this->$name;
+	}
+
+	public function __set( $name, $value ) {
+		return $this->$name = $value;
+	}
+
+	public function __isset( $name ) {
+		return isset( $this->$name );
+	}
+
+	public function __unset( $name ) {
+		unset( $this->$name );
+	}
+
+	public function __call( $name, $arguments ) {
+		return call_user_func_array( array( $this, $name ), $arguments );
+	}
+
+	private function callMe() {
+		return 'maybe';
+	}
+}
+
+class Basic_Subclass extends Basic_Object {}
+
+function _wp_die_handler( $message, $title = '', $args = array() ) {
+	if ( !$GLOBALS['_wp_die_disabled'] ) {
+		_wp_die_handler_txt( $message, $title, $args);
+	} else {
+		//Ignore at our peril
+	}
+}
+
+function _disable_wp_die() {
+	$GLOBALS['_wp_die_disabled'] = true;
+}
+
+function _enable_wp_die() {
+	$GLOBALS['_wp_die_disabled'] = false;
+}
+
+function _wp_die_handler_filter() {
+	return '_wp_die_handler';
+}
+
+function _wp_die_handler_txt( $message, $title, $args ) {
+	echo "\nwp_die called\n";
+	echo "Message : $message\n";
+	echo "Title : $title\n";
+	if ( ! empty( $args ) ) {
+		echo "Args: \n";
+		foreach( $args as $k => $v ){
+			echo "\t $k : $v\n";
+		}
+	}
+}

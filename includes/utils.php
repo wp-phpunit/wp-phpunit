@@ -25,7 +25,10 @@ class MockAction {
 	var $events;
 	var $debug;
 
-	function MockAction($debug=0) {
+	/**
+	 * PHP5 constructor.
+	 */
+	function __construct( $debug = 0 ) {
 		$this->reset();
 		$this->debug = $debug;
 	}
@@ -129,7 +132,10 @@ class testXMLParser {
 	var $xml;
 	var $data = array();
 
-	function testXMLParser($in) {
+	/**
+	 * PHP5 constructor.
+	 */
+	function __construct( $in ) {
 		$this->xml = xml_parser_create();
 		xml_set_object($this->xml, $this);
 		xml_parser_set_option($this->xml,XML_OPTION_CASE_FOLDING, 0);

@@ -21,8 +21,10 @@ class WPProfiler {
 	var $stack;
 	var $profile;
 
-	// constructor
-	function WPProfiler() {
+	/**
+	 * PHP5 constructor.
+	 */
+	function __construct() {
 		$this->stack = array();
 		$this->profile = array();
 	}

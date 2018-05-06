@@ -90,6 +90,7 @@ _delete_all_posts();
 require dirname( __FILE__ ) . '/testcase.php';
 require dirname( __FILE__ ) . '/testcase-xmlrpc.php';
 require dirname( __FILE__ ) . '/testcase-ajax.php';
+require dirname( __FILE__ ) . '/testcase-canonical.php';
 require dirname( __FILE__ ) . '/exceptions.php';
 require dirname( __FILE__ ) . '/utils.php';
 
@@ -127,11 +128,18 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 			}
 		}
 
-		$ajax_message = true;
+		$skipped_groups = array(
+			'ajax' => true,
+			'ms-files' => true,
+			'external-http' => true,
+		);
+
 		foreach ( $options as $option ) {
 			switch ( $option[0] ) {
 				case '--exclude-group' :
-					$ajax_message = false;
+					foreach ( $skipped_groups as $group_name => $skipped ) {
+						$skipped_groups[ $group_name ] = false;
+					}
 					continue 2;
 				case '--group' :
 					$groups = explode( ',', $option[1] );
@@ -140,12 +148,19 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 							WP_UnitTestCase::forceTicket( $group );
 						}
 					}
-					$ajax_message = ! in_array( 'ajax', $groups );
+
+					foreach ( $skipped_groups as $group_name => $skipped ) {
+						if ( in_array( $group_name, $groups ) ) {
+							$skipped_groups[ $group_name ] = false;
+						}
+					}
 					continue 2;
 			}
 		}
-		if ( $ajax_message ) {
-			echo "Not running ajax tests... To execute these, use --group ajax." . PHP_EOL;
+
+		$skipped_groups = array_filter( $skipped_groups );
+		foreach ( $skipped_groups as $group_name => $skipped ) {
+			echo sprintf( 'Not running %1$s tests. To execute these, use --group %1$s.', $group_name ) . PHP_EOL;
 		}
     }
 }

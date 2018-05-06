@@ -13,6 +13,11 @@ define( 'WP_INSTALLING', true );
 require_once $config_file_path;
 require_once dirname( __FILE__ ) . '/functions.php';
 
+// Set the theme to our special empty theme, to avoid interference from the current Twenty* theme.
+if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
+	define( 'WP_DEFAULT_THEME', 'default' );
+}
+
 tests_reset__SERVER();
 
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
@@ -26,6 +31,8 @@ require_once ABSPATH . '/wp-includes/wp-db.php';
 global $phpmailer;
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
 $phpmailer = new MockPHPMailer();
+
+register_theme_directory( dirname( __FILE__ ) . '/../data/themedir1' );
 
 /*
  * default_storage_engine and storage_engine are the same option, but storage_engine

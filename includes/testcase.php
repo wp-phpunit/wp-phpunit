@@ -47,6 +47,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
+			$this->reset_post_statuses();
 		}
 
 		$this->start_transaction();
@@ -54,9 +55,19 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 	}
 
+	/**
+	 * Detect post-test failure conditions.
+	 *
+	 * We use this method to detect expectedDeprecated and expectedIncorrectUsage annotations.
+	 *
+	 * @since 4.2.0
+	 */
+	protected function assertPostConditions() {
+		$this->expectedDeprecated();
+	}
+
 	function tearDown() {
 		global $wpdb, $wp_query, $post;
-		$this->expectedDeprecated();
 		$wpdb->query( 'ROLLBACK' );
 		if ( is_multisite() ) {
 			while ( ms_is_switched() ) {
@@ -105,6 +116,15 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			_unregister_taxonomy( $tax );
 		}
 		create_initial_taxonomies();
+	}
+
+	/**
+	 * Unregister non-built-in post statuses.
+	 */
+	protected function reset_post_statuses() {
+		foreach ( get_post_stati( array( '_builtin' => false ) ) as $post_status ) {
+			_unregister_post_status( $post_status );
+		}
 	}
 
 	/**
@@ -214,25 +234,55 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function expectedDeprecated() {
+		$errors = array();
+
 		$not_caught_deprecated = array_diff( $this->expected_deprecated, $this->caught_deprecated );
 		foreach ( $not_caught_deprecated as $not_caught ) {
-			$this->fail( "Failed to assert that $not_caught triggered a deprecated notice" );
+			$errors[] = "Failed to assert that $not_caught triggered a deprecated notice";
 		}
 
 		$unexpected_deprecated = array_diff( $this->caught_deprecated, $this->expected_deprecated );
 		foreach ( $unexpected_deprecated as $unexpected ) {
-			$this->fail( "Unexpected deprecated notice for $unexpected" );
+			$errors[] = "Unexpected deprecated notice for $unexpected";
 		}
 
 		$not_caught_doing_it_wrong = array_diff( $this->expected_doing_it_wrong, $this->caught_doing_it_wrong );
 		foreach ( $not_caught_doing_it_wrong as $not_caught ) {
-			$this->fail( "Failed to assert that $not_caught triggered an incorrect usage notice" );
+			$errors[] = "Failed to assert that $not_caught triggered an incorrect usage notice";
 		}
 
 		$unexpected_doing_it_wrong = array_diff( $this->caught_doing_it_wrong, $this->expected_doing_it_wrong );
 		foreach ( $unexpected_doing_it_wrong as $unexpected ) {
-			$this->fail( "Unexpected incorrect usage notice for $unexpected" );
+			$errors[] = "Unexpected incorrect usage notice for $unexpected";
 		}
+
+		if ( ! empty( $errors ) ) {
+			$this->fail( implode( "\n", $errors ) );
+		}
+	}
+
+	/**
+	 * Declare an expected `_deprecated_function()` or `_deprecated_argument()` call from within a test.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $deprecated Name of the function, method, class, or argument that is deprecated. Must match
+	 *                           first parameter of the `_deprecated_function()` or `_deprecated_argument()` call.
+	 */
+	public function setExpectedDeprecated( $deprecated ) {
+		array_push( $this->expected_deprecated, $deprecated );
+	}
+
+	/**
+	 * Declare an expected `_doing_it_wrong()` call from within a test.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $deprecated Name of the function, method, or class that appears in the first argument of the
+	 *                           source `_doing_it_wrong()` call.
+	 */
+	public function setExpectedIncorrectUsage( $doing_it_wrong ) {
+		array_push( $this->expected_doing_it_wrong, $doing_it_wrong );
 	}
 
 	function deprecated_function_run( $function ) {
@@ -283,7 +333,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		}
 		$parts = parse_url($url);
 		if (isset($parts['scheme'])) {
-			$req = $parts['path'];
+			$req = isset( $parts['path'] ) ? $parts['path'] : '';
 			if (isset($parts['query'])) {
 				$req .= '?' . $parts['query'];
 				// parse the url query vars into $_GET

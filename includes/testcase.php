@@ -49,27 +49,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->flush_cache();
 	}
 
-	/**
-	 * Allow tests to be skipped on some automated runs
-	 *
-	 * For test runs on Travis for something other than trunk/master 
-	 * we want to skip tests that only need to run for master.
-	 */
-	public function skipOnAutomatedBranches() {
-		// gentenv can be disabled
-		if ( ! function_exists( 'getenv' ) ) {
-			return false;
-		}
-
-		// https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
-		$travis_branch       = getenv( 'TRAVIS_BRANCH' );
-		$travis_pull_request = getenv( 'TRAVIS_PULL_REQUEST' );
-
-		if ( false !== $travis_pull_request && 'master' !== $travis_branch ) {
-			$this->markTestSkipped( 'For automated test runs, this test is only run on trunk/master' );
-		}
-	}
-
 	function flush_cache() {
 		global $wp_object_cache;
 		$wp_object_cache->group_ops = array();
@@ -148,18 +127,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( $unexpected_doing_it_wrong as $unexpected ) {
 			$this->fail( "Unexpected incorrect usage notice for $unexpected" );
 		}
-	}
-
-	/**
-	 * Declare an expected `_doing_it_wrong()` call from within a test.
-	 *
-	 * @since 4.2.0
-	 *
-	 * @param string $deprecated Name of the function, method, or class that appears in the first argument of the
-	 *                           source `_doing_it_wrong()` call.
-	 */
-	public function setExpectedIncorrectUsage( $doing_it_wrong ) {
-		array_push( $this->expected_doing_it_wrong, $doing_it_wrong );
 	}
 
 	function deprecated_function_run( $function ) {

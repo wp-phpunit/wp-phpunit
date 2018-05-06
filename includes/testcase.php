@@ -37,6 +37,18 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		ini_set('display_errors', 1 );
 		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
+
+		/*
+		 * When running core tests, ensure that post types and taxonomies
+		 * are reset for each test. We skip this step for non-core tests,
+		 * given the large number of plugins that register post types and
+		 * taxonomies at 'init'.
+		 */
+		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
+			$this->reset_post_types();
+			$this->reset_taxonomies();
+		}
+
 		$this->start_transaction();
 		$this->expectDeprecated();
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
@@ -58,12 +70,41 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 		$this->_restore_hooks();
+		wp_set_current_user( 0 );
 	}
 
 	function clean_up_global_scope() {
 		$_GET = array();
 		$_POST = array();
 		$this->flush_cache();
+	}
+
+	/**
+	 * Unregister existing post types and register defaults.
+	 *
+	 * Run before each test in order to clean up the global scope, in case
+	 * a test forgets to unregister a post type on its own, or fails before
+	 * it has a chance to do so.
+	 */
+	protected function reset_post_types() {
+		foreach ( get_post_types() as $pt ) {
+			_unregister_post_type( $pt );
+		}
+		create_initial_post_types();
+	}
+
+	/**
+	 * Unregister existing taxonomies and register defaults.
+	 *
+	 * Run before each test in order to clean up the global scope, in case
+	 * a test forgets to unregister a taxonomy on its own, or fails before
+	 * it has a chance to do so.
+	 */
+	protected function reset_taxonomies() {
+		foreach ( get_taxonomies() as $tax ) {
+			_unregister_taxonomy( $tax );
+		}
+		create_initial_taxonomies();
 	}
 
 	/**
@@ -103,7 +144,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			}
 		}
 	}
-	
+
 	function flush_cache() {
 		global $wp_object_cache;
 		$wp_object_cache->group_ops = array();
@@ -124,6 +165,16 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$wpdb->query( 'START TRANSACTION;' );
 		add_filter( 'query', array( $this, '_create_temporary_tables' ) );
 		add_filter( 'query', array( $this, '_drop_temporary_tables' ) );
+	}
+
+	/**
+	 * Commit the queries in a transaction.
+	 *
+	 * @since 4.1.0
+	 */
+	public static function commit_transaction() {
+		global $wpdb;
+		$wpdb->query( 'COMMIT;' );
 	}
 
 	function _create_temporary_tables( $query ) {
@@ -211,8 +262,15 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function assertEqualSets( $expected, $actual ) {
-		$this->assertEquals( array(), array_diff( $expected, $actual ) );
-		$this->assertEquals( array(), array_diff( $actual, $expected ) );
+		sort( $expected );
+		sort( $actual );
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function assertEqualSetsWithIndex( $expected, $actual ) {
+		ksort( $expected );
+		ksort( $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 
 	function go_to( $url ) {
@@ -253,6 +311,12 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	protected function checkRequirements() {
 		parent::checkRequirements();
+
+		// Core tests no longer check against open Trac tickets, but others using WP_UnitTestCase may do so.
+		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
+			return;
+		}
+
 		if ( WP_TESTS_FORCE_KNOWN_BUGS )
 			return;
 		$tickets = PHPUnit_Util_Test::getTickets( get_class( $this ), $this->getName( false ) );
@@ -328,7 +392,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( empty( $tmp_dir ) ) {
 			$tmp_dir = '/tmp';
 		}
-		$tmp_dir = realpath( $dir );
+		$tmp_dir = realpath( $tmp_dir );
 		return tempnam( $tmp_dir, 'wpunit' );
 	}
 
@@ -424,5 +488,35 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$uploads = wp_upload_dir();
 		$files = $this->files_in_dir( $uploads['basedir'] );
 		return $files;
+	}
+
+	function delete_folders( $path ) {
+		$this->matched_dirs = array();
+		if ( ! is_dir( $path ) ) {
+			return;
+		}
+
+		$this->scandir( $path );
+		foreach ( array_reverse( $this->matched_dirs ) as $dir ) {
+			rmdir( $dir );
+		}
+		rmdir( $path );
+	}
+
+	function scandir( $dir ) {
+		foreach ( scandir( $dir ) as $path ) {
+			if ( 0 !== strpos( $path, '.' ) && is_dir( $dir . '/' . $path ) ) {
+				$this->matched_dirs[] = $dir . '/' . $path;
+				$this->scandir( $dir . '/' . $path );
+			}
+		}
+	}
+
+	/**
+	 * Helper to Convert a microtime string into a float
+	 */
+	protected function _microtime_to_float($microtime ){
+		$time_array = explode( ' ', $microtime );
+		return array_sum( $time_array );
 	}
 }

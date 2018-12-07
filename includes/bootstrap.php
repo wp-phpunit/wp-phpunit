@@ -63,7 +63,11 @@ $phpmailer = new MockPHPMailer( true );
 if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
 	define( 'WP_DEFAULT_THEME', 'default' );
 }
-$wp_theme_directories = array( DIR_TESTDATA . '/themedir1' );
+$wp_theme_directories = array();
+
+if ( file_exists( DIR_TESTDATA . '/themedir1' ) ) {
+	$wp_theme_directories[] = DIR_TESTDATA . '/themedir1';
+}
 
 system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.php' ) . ' ' . escapeshellarg( $config_file_path ) . ' ' . $multisite, $retval );
 if ( 0 !== $retval ) {
@@ -113,6 +117,8 @@ require dirname( __FILE__ ) . '/testcase-canonical.php';
 require dirname( __FILE__ ) . '/exceptions.php';
 require dirname( __FILE__ ) . '/utils.php';
 require dirname( __FILE__ ) . '/spy-rest-server.php';
+require dirname( __FILE__ ) . '/class-wp-rest-test-search-handler.php';
+require dirname( __FILE__ ) . '/class-wp-fake-block-type.php';
 
 /**
  * A child class of the PHP test runner.

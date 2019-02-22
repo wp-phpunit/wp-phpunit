@@ -1,7 +1,20 @@
 <?php
 
-require_once dirname( __FILE__ ) . '/class-basic-object.php';
-require_once dirname( __FILE__ ) . '/class-basic-subclass.php';
+/**
+ * Retrieves PHPUnit runner version.
+ */
+function tests_get_phpunit_version() {
+	if ( class_exists( 'PHPUnit_Runner_Version' ) ) {
+		$version = PHPUnit_Runner_Version::id();
+	} elseif ( class_exists( 'PHPUnit\Runner\Version' ) ) {
+		// Must be parsable by PHP 5.2.x.
+		$version = call_user_func( 'PHPUnit\Runner\Version::id' );
+	} else {
+		$version = 0;
+	}
+
+	return $version;
+}
 
 /**
  * Resets various `$_SERVER` variables that can get altered during tests.
@@ -19,38 +32,61 @@ function tests_reset__SERVER() {
 	unset( $_SERVER['HTTPS'] );
 }
 
-// For adding hooks before loading WP
-function tests_add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1) {
+/**
+ * Adds hooks before loading WP.
+ *
+ * @param string       $tag             The name for the filter to add.
+ * @param object|array $function_to_add The function/callback to execute on call.
+ * @param int          $priority        The priority.
+ * @param int          $accepted_args   The amount of accepted arguments.
+ * @return bool Always true.
+ */
+function tests_add_filter( $tag, $function_to_add, $priority = 10, $accepted_args = 1 ) {
 	global $wp_filter;
 
 	if ( function_exists( 'add_filter' ) ) {
 		add_filter( $tag, $function_to_add, $priority, $accepted_args );
 	} else {
-		$idx = _test_filter_build_unique_id($tag, $function_to_add, $priority);
-		$wp_filter[$tag][$priority][$idx] = array('function' => $function_to_add, 'accepted_args' => $accepted_args);
+		$idx                                    = _test_filter_build_unique_id( $tag, $function_to_add, $priority );
+		$wp_filter[ $tag ][ $priority ][ $idx ] = array(
+			'function'      => $function_to_add,
+			'accepted_args' => $accepted_args,
+		);
 	}
 	return true;
 }
 
-function _test_filter_build_unique_id($tag, $function, $priority) {
-	if ( is_string($function) )
+/**
+ * Generates a unique function ID based on the given arguments.
+ *
+ * @param string       $tag      Unused. The name of the filter to build ID for.
+ * @param object|array $function The function to generate ID for.
+ * @param int          $priority Unused. The priority.
+ * @return string Unique function ID.
+ */
+function _test_filter_build_unique_id( $tag, $function, $priority ) {
+	if ( is_string( $function ) ) {
 		return $function;
+	}
 
-	if ( is_object($function) ) {
-		// Closures are currently implemented as objects
+	if ( is_object( $function ) ) {
+		// Closures are currently implemented as objects.
 		$function = array( $function, '' );
 	} else {
 		$function = (array) $function;
 	}
 
-	if (is_object($function[0]) ) {
-		return spl_object_hash($function[0]) . $function[1];
-	} else if ( is_string($function[0]) ) {
-		// Static Calling
-		return $function[0].$function[1];
+	if ( is_object( $function[0] ) ) {
+		return spl_object_hash( $function[0] ) . $function[1];
+	} elseif ( is_string( $function[0] ) ) {
+		// Static Calling.
+		return $function[0] . $function[1];
 	}
 }
 
+/**
+ * Deletes all data from the database.
+ */
 function _delete_all_data() {
 	global $wpdb;
 
@@ -60,14 +96,14 @@ function _delete_all_data() {
 		$wpdb->comments,
 		$wpdb->commentmeta,
 		$wpdb->term_relationships,
-		$wpdb->termmeta
+		$wpdb->termmeta,
 	) as $table ) {
 		$wpdb->query( "DELETE FROM {$table}" );
 	}
 
 	foreach ( array(
 		$wpdb->terms,
-		$wpdb->term_taxonomy
+		$wpdb->term_taxonomy,
 	) as $table ) {
 		$wpdb->query( "DELETE FROM {$table} WHERE term_id != 1" );
 	}
@@ -78,6 +114,9 @@ function _delete_all_data() {
 	$wpdb->query( "DELETE FROM {$wpdb->usermeta} WHERE user_id != 1" );
 }
 
+/**
+ * Deletes all posts from the database.
+ */
 function _delete_all_posts() {
 	global $wpdb;
 
@@ -96,8 +135,8 @@ function _delete_all_posts() {
 }
 
 function _wp_die_handler( $message, $title = '', $args = array() ) {
-	if ( !$GLOBALS['_wp_die_disabled'] ) {
-		_wp_die_handler_txt( $message, $title, $args);
+	if ( ! $GLOBALS['_wp_die_disabled'] ) {
+		_wp_die_handler_txt( $message, $title, $args );
 	} else {
 		//Ignore at our peril
 	}
@@ -125,7 +164,7 @@ function _wp_die_handler_txt( $message, $title, $args ) {
 	echo "Title : $title\n";
 	if ( ! empty( $args ) ) {
 		echo "Args: \n";
-		foreach( $args as $k => $v ){
+		foreach ( $args as $k => $v ) {
 			echo "\t $k : $v\n";
 		}
 	}
@@ -137,7 +176,7 @@ function _wp_die_handler_exit( $message, $title, $args ) {
 	echo "Title : $title\n";
 	if ( ! empty( $args ) ) {
 		echo "Args: \n";
-		foreach( $args as $k => $v ){
+		foreach ( $args as $k => $v ) {
 			echo "\t $k : $v\n";
 		}
 	}
@@ -163,8 +202,8 @@ function _upload_dir_no_subdir( $uploads ) {
 	$subdir = $uploads['subdir'];
 
 	$uploads['subdir'] = '';
-	$uploads['path'] = str_replace( $subdir, '', $uploads['path'] );
-	$uploads['url'] = str_replace( $subdir, '', $uploads['url'] );
+	$uploads['path']   = str_replace( $subdir, '', $uploads['path'] );
+	$uploads['url']    = str_replace( $subdir, '', $uploads['url'] );
 
 	return $uploads;
 }
@@ -173,10 +212,17 @@ function _upload_dir_no_subdir( $uploads ) {
  * Helper used with the `upload_dir` filter to set https upload URL.
  */
 function _upload_dir_https( $uploads ) {
-	$uploads['url'] = str_replace( 'http://', 'https://', $uploads['url'] );
+	$uploads['url']     = str_replace( 'http://', 'https://', $uploads['url'] );
 	$uploads['baseurl'] = str_replace( 'http://', 'https://', $uploads['baseurl'] );
 
 	return $uploads;
+}
+
+/**
+ * Use the Spy_REST_Server class for the REST server.
+ */
+function _wp_rest_server_class_filter() {
+	return 'Spy_REST_Server';
 }
 
 // Skip `setcookie` calls in auth_cookie functions due to warning:

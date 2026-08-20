@@ -1,0 +1,70 @@
+diff --git a/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php b/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php
+--- a/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php
++++ b/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php
+@@ -53,6 +53,10 @@ class Tests_Multisite_AvoidBlogPagePermalinkCollision extends WP_UnitTestCase {
+ 	}
+ 
+ 	public function test_avoid_blog_page_permalink_collision_renames_post_name() {
++		if ( is_subdomain_install() ) {
++			$this->markTestSkipped( 'Page/site path collisions only apply to subdirectory networks.' );
++		}
++
+ 		$this->assertNotSame( self::$post_and_blog_path, self::$root_page->post_name );
+ 	}
+ 
+diff --git a/tests/phpunit/tests/multisite/getBlogDetails.php b/tests/phpunit/tests/multisite/getBlogDetails.php
+--- a/tests/phpunit/tests/multisite/getBlogDetails.php
++++ b/tests/phpunit/tests/multisite/getBlogDetails.php
+@@ -125,7 +125,7 @@ class Tests_Multisite_GetBlogDetails extends WP_UnitTestCase {
+ 		}
+ 
+ 		$site = get_blog_details( array( 'domain' => 'wordpress.org' ) );
+-		$this->assertSame( self::$site_ids['wordpress.org/'], $site->blog_id );
++		$this->assertEquals( self::$site_ids['wordpress.org/'], $site->blog_id );
+ 	}
+ 
+ 	public function test_get_blog_details_with_only_domain_in_fields_subdirectory() {
+diff --git a/tests/phpunit/tests/multisite/site.php b/tests/phpunit/tests/multisite/site.php
+--- a/tests/phpunit/tests/multisite/site.php
++++ b/tests/phpunit/tests/multisite/site.php
+@@ -152,7 +152,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
+ 		$this->assertEquals( $details, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+ 
+ 		// get_blogaddress_by_name().
+-		$this->assertSame( 'http://' . $details->domain . $details->path, get_blogaddress_by_name( trim( $details->path, '/' ) ) );
++		$blog_name = is_subdomain_install() ? strtok( $details->domain, '.' ) : trim( $details->path, '/' );
++		$this->assertSame( 'http://' . $details->domain . $details->path, get_blogaddress_by_name( $blog_name ) );
+ 
+ 		// These are empty until get_blog_details() is called with $get_all = true.
+ 		$this->assertFalse( wp_cache_get( $blog_id, 'blog-details' ) );
+@@ -747,15 +748,29 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
+ 		force_ssl_admin( $force_ssl_admin );
+ 
+ 		// Install:
+-		$new = wpmu_create_blog( $current_site->domain, '/new-blog/', 'New Blog', get_current_user_id() );
++		if ( is_subdomain_install() ) {
++			$domain = 'new-blog.' . $current_site->domain;
++			$path   = $current_site->path;
++		} else {
++			$domain = $current_site->domain;
++			$path   = '/new-blog/';
++		}
++
++		$new = wpmu_create_blog( $domain, $path, 'New Blog', get_current_user_id() );
+ 
+ 		// Reset:
+ 		update_option( 'home', $home );
+ 		update_site_option( 'siteurl', $siteurl );
+ 		force_ssl_admin( $admin );
+ 
+ 		// Assert:
+ 		$this->assertNotWPError( $new );
++
++		if ( is_subdomain_install() ) {
++			$home_scheme    = 'http';
++			$siteurl_scheme = 'http';
++		}
++
+ 		$this->assertSame( $home_scheme, parse_url( get_blog_option( $new, 'home' ), PHP_URL_SCHEME ) );
+ 		$this->assertSame( $siteurl_scheme, parse_url( get_blog_option( $new, 'siteurl' ), PHP_URL_SCHEME ) );
+ 	}

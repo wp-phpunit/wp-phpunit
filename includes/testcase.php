@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Basic abstract test class.
  *

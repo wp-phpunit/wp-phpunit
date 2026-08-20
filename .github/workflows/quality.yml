@@ -1,0 +1,69 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          tools: composer:v2
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer quality
+      - run: composer core:audit
+
+  wordpress-core:
+    name: WordPress Core / ${{ matrix.suite }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - single-site
+          - multisite
+          - multisite-subdomain
+          - external-object-cache
+          - html5lib
+          - ajax
+          - ms-files
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_DATABASE: wordpress_test
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping --host=127.0.0.1 --user=root --password=root"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+      memcached:
+        image: memcached:1.6.45-alpine
+        ports:
+          - 11211:11211
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          extensions: mysqli, memcached
+          tools: composer:v2
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer core:test:${{ matrix.suite }}

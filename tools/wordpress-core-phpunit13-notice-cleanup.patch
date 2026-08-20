@@ -1,0 +1,196 @@
+--- a/tests/phpunit/tests/widgets/wpWidgetMedia.php
++++ b/tests/phpunit/tests/widgets/wpWidgetMedia.php
+@@ -27,18 +27,30 @@
+ 	}
+ 
+ 	/**
+-	 * Get instance for mocked media widget class.
++	 * Get a stubbed media widget instance.
+ 	 *
+ 	 * @param string $id_base         Base ID for the widget, lowercase and unique.
+ 	 * @param string $name            Name for the widget displayed on the configuration page.
+ 	 * @param array  $widget_options  Optional. Widget options.
+ 	 * @param array  $control_options Optional. Widget control options.
+-	 * @return PHPUnit_Framework_MockObject_MockObject|WP_Widget_Media Mocked instance.
++	 * @return PHPUnit\Framework\MockObject\Stub&WP_Widget_Media Stubbed instance.
+ 	 */
+-	private function get_mocked_class_instance( $id_base = 'mocked', $name = 'Mocked', $widget_options = array(), $control_options = array() ) {
+-		return $this->getMockBuilder( 'WP_Widget_Media' )
++	private function get_stubbed_class_instance( $id_base = 'mocked', $name = 'Mocked', $widget_options = array(), $control_options = array() ) {
++		return self::getStubBuilder( 'WP_Widget_Media' )
+ 			->setConstructorArgs( array( $id_base, $name, $widget_options, $control_options ) )
+ 			->onlyMethods( array( 'render_media' ) )
++			->getStub();
++	}
++
++	/**
++	 * Get a mocked media widget instance for interaction assertions.
++	 *
++	 * @return PHPUnit\Framework\MockObject\MockObject&WP_Widget_Media Mocked instance.
++	 */
++	private function get_mocked_class_instance() {
++		return $this->getMockBuilder( 'WP_Widget_Media' )
++			->setConstructorArgs( array( 'mocked', 'Mocked', array(), array() ) )
++			->onlyMethods( array( 'render_media' ) )
+ 			->getMock();
+ 	}
+ 
+@@ -49,7 +61,8 @@
+ 	 * @covers WP_Widget_Media::_register
+ 	 */
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_constructor() {
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 		$widget->_register();
+ 
+ 		$this->assertArrayHasKey( 'mime_type', $widget->widget_options );
+@@ -86,7 +98,7 @@
+ 			'width'  => 850,
+ 			'height' => 1100,
+ 		);
+-		$widget          = $this->get_mocked_class_instance( $id_base, $name, $widget_options, $control_options );
++		$widget          = $this->get_stubbed_class_instance( $id_base, $name, $widget_options, $control_options );
+ 		$this->assertSame( $id_base, $widget->id_base );
+ 		$this->assertSame( $name, $widget->name );
+ 
+@@ -125,7 +137,7 @@
+ 		);
+ 		$wp_customize->start_previewing_theme();
+ 
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 		$widget->_register();
+ 		$this->assertSame( 10, has_action( 'wp_enqueue_scripts', array( $widget, 'enqueue_preview_scripts' ) ) );
+ 	}
+@@ -149,7 +161,7 @@
+ 			)
+ 		);
+ 		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $test_image ) );
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 
+ 		$this->assertFalse( $widget->is_attachment_with_mime_type( 0, 'image' ) );
+ 		$this->assertFalse( $widget->is_attachment_with_mime_type( -123, 'image' ) );
+@@ -166,7 +178,7 @@
+ 	 * @covers WP_Widget_Media::sanitize_token_list
+ 	 */
+ 	public function test_sanitize_token_list_string() {
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 
+ 		$result = $widget->sanitize_token_list( 'What A false class with-token <a href="#">and link</a>' );
+ 		$this->assertSame( 'What A false class with-token a hrefand linka', $result );
+@@ -203,7 +215,7 @@
+ 	 * @covers WP_Widget_Media::get_instance_schema
+ 	 */
+ 	public function test_get_instance_schema() {
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 		$schema = $widget->get_instance_schema();
+ 
+ 		$this->assertSameSets(
+@@ -231,7 +243,7 @@
+ 	 * @covers WP_Widget_Media::update
+ 	 */
+ 	public function test_update() {
+-		$widget   = $this->get_mocked_class_instance();
++		$widget   = $this->get_stubbed_class_instance();
+ 		$instance = array();
+ 
+ 		// Should return valid attachment ID.
+@@ -360,7 +372,7 @@
+ 		$instance['url']           = '';
+ 		$instance['attachment_id'] = 0;
+ 		ob_start();
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 		$widget->widget( $args, $instance );
+ 		$output = ob_get_clean();
+ 		$this->assertEmpty( $output );
+@@ -392,7 +404,7 @@
+ 	 * @covers WP_Widget_Media::form
+ 	 */
+ 	public function test_form() {
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 
+ 		ob_start();
+ 		$widget->form( array() );
+@@ -409,7 +421,7 @@
+ 	 * @covers WP_Widget_Media::display_media_state
+ 	 */
+ 	public function test_display_media_state() {
+-		$widget        = $this->get_mocked_class_instance();
++		$widget        = $this->get_stubbed_class_instance();
+ 		$attachment_id = self::factory()->attachment->create_object(
+ 			array(
+ 				'file'           => DIR_TESTDATA . '/images/canola.jpg',
+@@ -452,7 +464,7 @@
+ 	 */
+ 	public function test_enqueue_admin_scripts() {
+ 		set_current_screen( 'widgets.php' );
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 		$widget->enqueue_admin_scripts();
+ 
+ 		$this->assertTrue( wp_script_is( 'media-widgets' ) );
+@@ -464,7 +476,7 @@
+ 	 * @covers WP_Widget_Media::render_control_template_scripts
+ 	 */
+ 	public function test_render_control_template_scripts() {
+-		$widget = $this->get_mocked_class_instance();
++		$widget = $this->get_stubbed_class_instance();
+ 
+ 		ob_start();
+ 		$widget->render_control_template_scripts();
+@@ -494,7 +506,7 @@
+ 		}
+ 
+ 		$result = $has_content->invokeArgs(
+-			$this->get_mocked_class_instance(),
++			$this->get_stubbed_class_instance(),
+ 			array(
+ 				array(
+ 					'attachment_id' => 0,
+@@ -505,7 +517,7 @@
+ 		$this->assertFalse( $result );
+ 
+ 		$result = $has_content->invokeArgs(
+-			$this->get_mocked_class_instance(),
++			$this->get_stubbed_class_instance(),
+ 			array(
+ 				array(
+ 					'attachment_id' => $attachment_id,
+@@ -516,7 +528,7 @@
+ 		$this->assertTrue( $result );
+ 
+ 		$result = $has_content->invokeArgs(
+-			$this->get_mocked_class_instance(),
++			$this->get_stubbed_class_instance(),
+ 			array(
+ 				array(
+ 					'attachment_id' => 0,
+--- a/tests/phpunit/tests/functions/wpUniquePrefixedId.php
++++ b/tests/phpunit/tests/functions/wpUniquePrefixedId.php
+@@ -156,18 +156,14 @@
+ 	#[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+ 	#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+ 	public function test_same_prefixes_should_generate_unique_ids( array $prefixes, array $expected ) {
+-		// Suppress E_USER_NOTICE, which will be raised when a prefix is non-string.
+-		$original_error_reporting = error_reporting();
+-		error_reporting( $original_error_reporting & ~E_USER_NOTICE );
++		$this->expectNotice();
++		$this->expectNoticeMessage( 'The prefix must be a string.' );
+ 
+ 		$ids = array();
+ 		foreach ( $prefixes as $prefix ) {
+ 			$ids[] = wp_unique_prefixed_id( $prefix );
+ 		}
+ 
+-		// Reset error reporting.
+-		error_reporting( $original_error_reporting );
+-
+ 		$this->assertSameSets( $ids, array_unique( $ids ), 'IDs are not unique.' );
+ 		$this->assertSameSets( $expected, $ids, 'The IDs did not match the expected values.' );
+ 	}

@@ -1,0 +1,409 @@
+diff --git a/tests/phpunit/tests/compat/strContains.php b/tests/phpunit/tests/compat/strContains.php
+index 73ee1cd09d..500b5ccc8c 100644
+--- a/tests/phpunit/tests/compat/strContains.php
++++ b/tests/phpunit/tests/compat/strContains.php
+@@ -63,27 +63,27 @@ class Tests_Compat_strContains extends WP_UnitTestCase {
+ 			),
+ 			'end of string'             => array(
+ 				'expected' => true,
+-				'string'   => 'The needle is at end.',
++				'haystack' => 'The needle is at end.',
+ 				'needle'   => 'end',
+ 			),
+ 			'lowercase'                 => array(
+ 				'expected' => true,
+-				'string'   => 'This is a test',
++				'haystack' => 'This is a test',
+ 				'needle'   => 'test',
+ 			),
+ 			'uppercase'                 => array(
+ 				'expected' => true,
+-				'string'   => 'This is a TEST',
++				'haystack' => 'This is a TEST',
+ 				'needle'   => 'TEST',
+ 			),
+ 			'camelCase'                 => array(
+ 				'expected' => true,
+-				'string'   => 'String contains camelCase.',
++				'haystack' => 'String contains camelCase.',
+ 				'needle'   => 'camelCase',
+ 			),
+ 			'with hyphen'               => array(
+ 				'expected' => true,
+-				'string'   => 'String contains foo-bar needle.',
++				'haystack' => 'String contains foo-bar needle.',
+ 				'needle'   => 'foo-bar',
+ 			),
+ 			'missing'                   => array(
+diff --git a/tests/phpunit/tests/dependencies/scripts.php b/tests/phpunit/tests/dependencies/scripts.php
+index 080ef4b146..809099a511 100644
+--- a/tests/phpunit/tests/dependencies/scripts.php
++++ b/tests/phpunit/tests/dependencies/scripts.php
+@@ -2055,11 +2055,11 @@ HTML;
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('12009')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('get_data_for_test_setting_in_footer_and_strategy')]
+-	public function test_setting_in_footer_and_strategy( $set_up, $expected_group, $expected_strategy ) {
++	public function test_setting_in_footer_and_strategy( $set_up, $group, $strategy ) {
+ 		$handle = 'foo';
+ 		$set_up( $handle );
+-		$this->assertSame( $expected_group, wp_scripts()->get_data( $handle, 'group' ) );
+-		$this->assertSame( $expected_strategy, wp_scripts()->get_data( $handle, 'strategy' ) );
++		$this->assertSame( $group, wp_scripts()->get_data( $handle, 'group' ) );
++		$this->assertSame( $strategy, wp_scripts()->get_data( $handle, 'strategy' ) );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/functions/maybeSerialize.php b/tests/phpunit/tests/functions/maybeSerialize.php
+index a8db0507f0..eba492ff1d 100644
+--- a/tests/phpunit/tests/functions/maybeSerialize.php
++++ b/tests/phpunit/tests/functions/maybeSerialize.php
+@@ -38,7 +38,10 @@ class Tests_Functions_MaybeSerialize extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_is_serialized')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_is_not_serialized')]
+-	public function test_maybe_unserialize( $value, $is_serialized ) {
++	public function test_maybe_unserialize( $data, $expected ) {
++		$value         = $data;
++		$is_serialized = $expected;
++
+ 		if ( $is_serialized ) {
+ 			$expected = unserialize( trim( $value ) );
+ 		} else {
+diff --git a/tests/phpunit/tests/functions/wpIsNumericArray.php b/tests/phpunit/tests/functions/wpIsNumericArray.php
+index 14ad708c0c..8928a10fe4 100644
+--- a/tests/phpunit/tests/functions/wpIsNumericArray.php
++++ b/tests/phpunit/tests/functions/wpIsNumericArray.php
+@@ -15,8 +15,8 @@ class Tests_Functions_wpIsNumericArray extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_wp_is_numeric_array')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('53971')]
+-	public function test_wp_is_numeric_array( $input, $expected ) {
+-		$this->assertSame( $expected, wp_is_numeric_array( $input ) );
++	public function test_wp_is_numeric_array( $test_array, $expected ) {
++		$this->assertSame( $expected, wp_is_numeric_array( $test_array ) );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/functions/wpUniquePrefixedId.php b/tests/phpunit/tests/functions/wpUniquePrefixedId.php
+index 7aefec2c64..bce4700c34 100644
+--- a/tests/phpunit/tests/functions/wpUniquePrefixedId.php
++++ b/tests/phpunit/tests/functions/wpUniquePrefixedId.php
+@@ -121,19 +121,19 @@ class Tests_Functions_WpUniquePrefixedId extends WP_UnitTestCase {
+ 			'prefix as (int) 1'       => array(
+ 				'non_string_prefix'         => 1,
+ 				'number_of_ids_to_generate' => 4,
+-				'expected_data_type'        => sprintf( $message, 'integer' ),
++				'expected_message'          => sprintf( $message, 'integer' ),
+ 				'expected_ids'              => array( '1', '2', '3', '4' ),
+ 			),
+ 			'prefix as (bool) false'  => array(
+ 				'non_string_prefix'         => false,
+ 				'number_of_ids_to_generate' => 5,
+-				'expected_data_type'        => sprintf( $message, 'boolean' ),
++				'expected_message'          => sprintf( $message, 'boolean' ),
+ 				'expected_ids'              => array( '1', '2', '3', '4', '5' ),
+ 			),
+ 			'prefix as (double) 98.7' => array(
+ 				'non_string_prefix'         => 98.7,
+ 				'number_of_ids_to_generate' => 6,
+-				'expected_data_type'        => sprintf( $message, 'double' ),
++				'expected_message'          => sprintf( $message, 'double' ),
+ 				'expected_ids'              => array( '1', '2', '3', '4', '5', '6' ),
+ 			),
+ 		);
+diff --git a/tests/phpunit/tests/general/wpPreloadResources.php b/tests/phpunit/tests/general/wpPreloadResources.php
+index fd09eb5516..e4265b9768 100644
+--- a/tests/phpunit/tests/general/wpPreloadResources.php
++++ b/tests/phpunit/tests/general/wpPreloadResources.php
+@@ -34,7 +34,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 		return array(
+ 			'basic_preload'          => array(
+ 				'expected' => "<link rel='preload' href='https://example.com/style.css' as='style' />\n",
+-				'urls'     => array(
++				'preload_resources' => array(
+ 					array(
+ 						'href' => 'https://example.com/style.css',
+ 						'as'   => 'style',
+@@ -44,7 +44,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 			'multiple_links'         => array(
+ 				'expected' => "<link rel='preload' href='https://example.com/style.css' as='style' />\n" .
+ 							"<link rel='preload' href='https://example.com/main.js' as='script' />\n",
+-				'urls'     => array(
++				'preload_resources' => array(
+ 					array(
+ 						'href' => 'https://example.com/style.css',
+ 						'as'   => 'style',
+@@ -59,7 +59,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 				'expected' => "<link rel='preload' href='https://example.com/style.css' as='style' />\n" .
+ 							"<link rel='preload' href='https://example.com/video.mp4' as='video' type='video/mp4' />\n" .
+ 							"<link rel='preload' href='https://example.com/main.js' as='script' />\n",
+-				'urls'     => array(
++				'preload_resources' => array(
+ 					array(
+ 						// Should ignore not valid attributes.
+ 						'not'  => 'valid',
+@@ -82,7 +82,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 							"<link rel='preload' href='https://example.com/video.mp4' as='video' type='video/mp4' />\n" .
+ 							"<link rel='preload' href='https://example.com/main.js' as='script' />\n" .
+ 							"<link rel='preload' href='https://example.com/font.woff2' as='font' type='font/woff2' crossorigin />\n",
+-				'urls'     => array(
++				'preload_resources' => array(
+ 					array(
+ 						'href'        => 'https://example.com/style.css',
+ 						'as'          => 'style',
+@@ -114,7 +114,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 							"<link rel='preload' href='https://example.com/font.woff2' as='font' type='font/woff2' crossorigin />\n" .
+ 							"<link rel='preload' href='https://example.com/image-narrow.png' as='image' media='(max-width: 600px)' />\n" .
+ 							"<link rel='preload' href='https://example.com/image-wide.png' as='image' media='(min-width: 601px)' />\n",
+-				'urls'     => array(
++				'preload_resources' => array(
+ 					array(
+ 						'href'        => 'https://example.com/style.css',
+ 						'as'          => 'style',
+@@ -163,7 +163,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 							"<link rel='preload' as='image' imagesrcset='640.png 640w, 800.png 800w, 1024.png 1024w' imagesizes='100vw' />\n" .
+ 							"<link rel='preload' href='https://example.com/image-wide.png' as='image' media='(min-width: 601px)' />\n" .
+ 							"<link rel='preload' href='https://example.com/image-800.png' as='image' imagesrcset='640.png 640w, 800.png 800w, 1024.png 1024w' />\n",
+-				'urls'     => array(
++				'preload_resources' => array(
+ 					array(
+ 						'href'        => 'https://example.com/style.css',
+ 						'as'          => 'style',
+@@ -249,7 +249,7 @@ class Tests_General_wpPreloadResources extends WP_UnitTestCase {
+ 			),
+ 			'fetchpriority'          => array(
+ 				'expected'  => "<link rel='preload' href='https://example.com/image.jpg' as='image' fetchpriority='high' />\n",
+-				'resources' => array(
++				'preload_resources' => array(
+ 					array(
+ 						'href'          => 'https://example.com/image.jpg',
+ 						'as'            => 'image',
+diff --git a/tests/phpunit/tests/html-api/wpHtmlTagProcessor.php b/tests/phpunit/tests/html-api/wpHtmlTagProcessor.php
+index 81b760e60b..8a0ff3f26b 100644
+--- a/tests/phpunit/tests/html-api/wpHtmlTagProcessor.php
++++ b/tests/phpunit/tests/html-api/wpHtmlTagProcessor.php
+@@ -2794,8 +2794,8 @@ HTML;
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('56299')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_updating_attributes')]
+-	public function test_updating_attributes( $html, $expected ) {
+-		$processor = new WP_HTML_Tag_Processor( $html );
++	public function test_updating_attributes( $input, $expected ) {
++		$processor = new WP_HTML_Tag_Processor( $input );
+ 		$processor->next_tag();
+ 		$processor->set_attribute( 'foo', 'bar' );
+ 		$processor->add_class( 'firstTag' );
+@@ -2858,8 +2858,8 @@ HTML;
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('56299')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_updating_attributes_in_malformed_html')]
+-	public function test_updating_attributes_in_malformed_html( $html, $expected ) {
+-		$processor = new WP_HTML_Tag_Processor( $html );
++	public function test_updating_attributes_in_malformed_html( $input, $expected ) {
++		$processor = new WP_HTML_Tag_Processor( $input );
+ 		$this->assertTrue( $processor->next_tag(), 'Could not find first tag.' );
+ 		$processor->set_attribute( 'foo', 'bar' );
+ 		$processor->add_class( 'firstTag' );
+diff --git a/tests/phpunit/tests/image/meta.php b/tests/phpunit/tests/image/meta.php
+index c5916daad5..7ccafbfa10 100644
+--- a/tests/phpunit/tests/image/meta.php
++++ b/tests/phpunit/tests/image/meta.php
+@@ -187,10 +187,10 @@ class Tests_Image_Meta extends WP_UnitTestCase {
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_stream')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('52826')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('52922')]
+-	public function test_stream( $file, $expected ) {
++	public function test_stream( $file, $metadata ) {
+ 		$actual = wp_read_image_metadata( $file );
+ 
+-		$this->assertSame( $expected, $actual );
++		$this->assertSame( $metadata, $actual );
+ 	}
+ 
+ 	public static function data_stream() {
+diff --git a/tests/phpunit/tests/link/getThePostsNavigation.php b/tests/phpunit/tests/link/getThePostsNavigation.php
+index 015aae9a5a..59f8e58b9c 100644
+--- a/tests/phpunit/tests/link/getThePostsNavigation.php
++++ b/tests/phpunit/tests/link/getThePostsNavigation.php
+@@ -33,14 +33,14 @@ class Tests_Link_GetThePostsNavigation extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('55751')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_get_the_posts_navigation')]
+-	public function test_get_the_posts_navigation( $per_page, $paged_num, $older, $newer ) {
++	public function test_get_the_posts_navigation( $post_per_page, $paged_num, $older, $newer ) {
+ 		global $wp_query, $paged;
+ 
+ 		$paged    = $paged_num;
+ 		$wp_query = new WP_Query(
+ 			array(
+ 				'post_type'      => 'post',
+-				'posts_per_page' => $per_page,
++				'posts_per_page' => $post_per_page,
+ 				'paged'          => $paged,
+ 			)
+ 		);
+diff --git a/tests/phpunit/tests/query/cacheResults.php b/tests/phpunit/tests/query/cacheResults.php
+index 8395e7a892..e37b2abf6b 100644
+--- a/tests/phpunit/tests/query/cacheResults.php
++++ b/tests/phpunit/tests/query/cacheResults.php
+@@ -392,14 +392,14 @@ class Test_Query_CacheResults extends WP_UnitTestCase {
+ 	#[\PHPUnit\Framework\Attributes\Ticket('59442')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('59516')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_query_cache_duplicate')]
+-	public function test_generate_cache_key_normalize( $query_vars1, $query_vars2 ) {
++	public function test_generate_cache_key_normalize( $query_vars_1, $query_vars_2 ) {
+ 		global $wpdb;
+ 
+ 		$fields   = "{$wpdb->posts}.ID";
+-		$query1   = new WP_Query( $query_vars1 );
++		$query1   = new WP_Query( $query_vars_1 );
+ 		$request1 = str_replace( $fields, "{$wpdb->posts}.*", $query1->request );
+ 
+-		$query2   = new WP_Query( $query_vars2 );
++		$query2   = new WP_Query( $query_vars_2 );
+ 		$request2 = str_replace( $fields, "{$wpdb->posts}.*", $query2->request );
+ 
+ 		$reflection_q1 = new ReflectionProperty( $query1, 'query_cache_key' );
+diff --git a/tests/phpunit/tests/rest-api/Tests_REST_Server.php b/tests/phpunit/tests/rest-api/Tests_REST_Server.php
+index 7576d5a7a5..33b8dd4c28 100644
+--- a/tests/phpunit/tests/rest-api/Tests_REST_Server.php
++++ b/tests/phpunit/tests/rest-api/Tests_REST_Server.php
+@@ -1348,7 +1348,7 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
+ 				'expected_fields' => array( 'site_logo', 'site_icon', 'site_icon_url' ),
+ 			),
+ 			'_embed request parameter'           => array(
+-				'field'             => '_embed',
++				'fields'            => '_embed',
+ 				'expected_fields'   => array( 'site_logo', 'site_icon', 'site_icon_url' ),
+ 				'unexpected_fields' => array(),
+ 				'is_embed'          => true,
+diff --git a/tests/phpunit/tests/rest-api/WP_REST_Pattern_Directory_Controller_Test.php b/tests/phpunit/tests/rest-api/WP_REST_Pattern_Directory_Controller_Test.php
+index 520893af49..8c72114eb0 100644
+--- a/tests/phpunit/tests/rest-api/WP_REST_Pattern_Directory_Controller_Test.php
++++ b/tests/phpunit/tests/rest-api/WP_REST_Pattern_Directory_Controller_Test.php
+@@ -765,7 +765,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
+ 					'slug'        => array( 'some_other_slug' ),
+ 				),
+ 				'message'      => 'Transient keys must not match.',
+-				false,
++				'assert_same'  => false,
+ 			),
+ 			'different keys'                        => array(
+ 				'parameters_1' => array(
+@@ -775,7 +775,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
+ 					'parameter_2' => 1,
+ 				),
+ 				'message'      => 'Transient keys must depend on array keys.',
+-				false,
++				'assert_same'  => false,
+ 			),
+ 		);
+ 	}
+diff --git a/tests/phpunit/tests/rewrite/wpResolveNumericSlugConflicts.php b/tests/phpunit/tests/rewrite/wpResolveNumericSlugConflicts.php
+index 3eb1a79dc4..66bd1caf1b 100644
+--- a/tests/phpunit/tests/rewrite/wpResolveNumericSlugConflicts.php
++++ b/tests/phpunit/tests/rewrite/wpResolveNumericSlugConflicts.php
+@@ -29,14 +29,14 @@ class Tests_Rewrite_wpResolveNumericSlugConflicts extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('52252')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_should_not_throw_warning_for_malformed_date_queries')]
+-	public function test_should_not_throw_warning_for_malformed_date_queries( $permalink_structure, $query_vars ) {
++	public function test_should_not_throw_warning_for_malformed_date_queries( $permalink_structure, $query ) {
+ 		$this->set_permalink_structure( $permalink_structure );
+ 
+ 		/*
+ 		 * For malformed date queries, the function is unable to identify the requested post,
+ 		 * and just returns the initial query vars.
+ 		 */
+-		$this->assertSame( $query_vars, wp_resolve_numeric_slug_conflicts( $query_vars ) );
++		$this->assertSame( $query, wp_resolve_numeric_slug_conflicts( $query ) );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/theme/wpThemeGetBlockPatterns.php b/tests/phpunit/tests/theme/wpThemeGetBlockPatterns.php
+index 7c1164fea6..7cdb273648 100644
+--- a/tests/phpunit/tests/theme/wpThemeGetBlockPatterns.php
++++ b/tests/phpunit/tests/theme/wpThemeGetBlockPatterns.php
+@@ -86,10 +86,10 @@ class Tests_Theme_WPThemeGetBlockPatterns extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('59490')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_get_block_patterns')]
+-	public function test_should_return_block_patterns( $theme_slug, $expected ) {
+-		$theme    = wp_get_theme( $theme_slug );
+-		$patterns = $theme->get_block_patterns();
+-		$this->assertSameSets( $expected, $patterns );
++	public function test_should_return_block_patterns( $theme, $patterns ) {
++		$theme           = wp_get_theme( $theme );
++		$actual_patterns = $theme->get_block_patterns();
++		$this->assertSameSets( $patterns, $actual_patterns );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/theme/wpThemeJson.php b/tests/phpunit/tests/theme/wpThemeJson.php
+index baa9c7bf09..b037bdaa74 100644
+--- a/tests/phpunit/tests/theme/wpThemeJson.php
++++ b/tests/phpunit/tests/theme/wpThemeJson.php
+@@ -4612,7 +4612,7 @@ class Tests_Theme_wpThemeJson extends WP_UnitTestCase {
+ 	#[\PHPUnit\Framework\Attributes\Ticket('57583')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('61165')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_get_styles_for_block_with_style_variations')]
+-	public function test_get_styles_for_block_with_style_variations( $theme_json_variations, $metadata_variations, $expected ) {
++	public function test_get_styles_for_block_with_style_variations( $theme_json_variations, $metadata_variation, $expected ) {
+ 		$theme_json = new WP_Theme_JSON(
+ 			array(
+ 				'version' => WP_Theme_JSON::LATEST_SCHEMA,
+@@ -4628,7 +4628,7 @@ class Tests_Theme_wpThemeJson extends WP_UnitTestCase {
+ 		$metadata      = array(
+ 			'path'       => array( 'styles', 'blocks', 'core/quote' ),
+ 			'selector'   => '.wp-block-quote',
+-			'variations' => $metadata_variations,
++			'variations' => $metadata_variation,
+ 		);
+ 		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+ 		$this->assertSame( $expected, $actual_styles );
+diff --git a/tests/phpunit/tests/user/query.php b/tests/phpunit/tests/user/query.php
+index 72d6bf0d8e..8c4a186741 100644
+--- a/tests/phpunit/tests/user/query.php
++++ b/tests/phpunit/tests/user/query.php
+@@ -2005,10 +2005,10 @@ class Tests_User_Query extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('53177')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_returning_field_subset_as_string')]
+-	public function test_returning_field_subset_as_string( $field, $expected ) {
++	public function test_returning_field_subset_as_string( $fields, $expected ) {
+ 		$q       = new WP_User_Query(
+ 			array(
+-				'fields'  => $field,
++				'fields'  => $fields,
+ 				'include' => array( '1' ),
+ 			)
+ 		);
+@@ -2083,10 +2083,10 @@ class Tests_User_Query extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('53177')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_returning_field_subset_as_array')]
+-	public function test_returning_field_subset_as_array( $field, $expected ) {
++	public function test_returning_field_subset_as_array( $fields, $expected ) {
+ 		$q       = new WP_User_Query(
+ 			array(
+-				'fields'  => $field,
++				'fields'  => $fields,
+ 				'include' => array( '1' ),
+ 			)
+ 		);
+diff --git a/tests/phpunit/tests/widgets/wpWidgetRss.php b/tests/phpunit/tests/widgets/wpWidgetRss.php
+index 1ae3e30856..7f85066a1f 100644
+--- a/tests/phpunit/tests/widgets/wpWidgetRss.php
++++ b/tests/phpunit/tests/widgets/wpWidgetRss.php
+@@ -93,8 +93,8 @@ class Tests_Widgets_wpWidgetRss extends WP_UnitTestCase {
+ 	public static function data_url_happy_path() {
+ 		return array(
+ 			'when url is given' => array(
+-				'url' => 'https://wordpress.org/news/feed/',
+-				'<section id="widget_rss-5" class="widget widget_rss"><h2><a class="rsswidget rss-widget-feed" href="https://wordpress.org/news/feed/">',
++				'url'      => 'https://wordpress.org/news/feed/',
++				'expected' => '<section id="widget_rss-5" class="widget widget_rss"><h2><a class="rsswidget rss-widget-feed" href="https://wordpress.org/news/feed/">',
+ 			),
+ 		);
+ 	}

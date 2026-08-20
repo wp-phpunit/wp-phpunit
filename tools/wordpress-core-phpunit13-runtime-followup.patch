@@ -1,0 +1,86 @@
+diff --git a/tests/phpunit/tests/connectors/wpRegisterDefaultConnectorSettings.php b/tests/phpunit/tests/connectors/wpRegisterDefaultConnectorSettings.php
+index 93ef5aade0..550b2938e0 100644
+--- a/tests/phpunit/tests/connectors/wpRegisterDefaultConnectorSettings.php
++++ b/tests/phpunit/tests/connectors/wpRegisterDefaultConnectorSettings.php
+@@ -25,7 +25,7 @@ class Tests_Connectors_WpRegisterDefaultConnectorSettings extends WP_UnitTestCas
+ 		parent::set_up();
+ 
+ 		global $wp_registered_settings;
+-		$this->original_registered_settings = $wp_registered_settings;
++		$this->original_registered_settings = $wp_registered_settings ?? array();
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/http/includeOldRequestsClass.php b/tests/phpunit/tests/http/includeOldRequestsClass.php
+index 20844b0a4a..4679552de9 100644
+--- a/tests/phpunit/tests/http/includeOldRequestsClass.php
++++ b/tests/phpunit/tests/http/includeOldRequestsClass.php
+@@ -14,8 +14,11 @@ class Tests_HTTP_IncludeOldRequestsClass extends WP_UnitTestCase {
+ 	#[\PHPUnit\Framework\Attributes\Ticket('57341')]
+ 	#[\PHPUnit\Framework\Attributes\CoversNothing]
+ 	public function test_should_include_old_requests_class() {
+-		$this->expectUserDeprecationMessage( 'The PSR-0 `Requests_...` class names in the Requests library are deprecated.' );
+-
+-		new Requests();
++		$this->assertExpectedUserDeprecation(
++			'The PSR-0 `Requests_...` class names in the Requests library are deprecated.',
++			static function () {
++				class_exists( 'Requests' );
++			}
++		);
+ 	}
+ }
+diff --git a/tests/phpunit/tests/pomo/PluralFormsTest.php b/tests/phpunit/tests/pomo/PluralFormsTest.php
+index dd6c7d3071..218ae166c9 100644
+--- a/tests/phpunit/tests/pomo/PluralFormsTest.php
++++ b/tests/phpunit/tests/pomo/PluralFormsTest.php
+@@ -224,7 +224,7 @@ class PluralFormsTest extends WP_UnitTestCase {
+ 		$mock->expects( $this->once() )
+ 			->method( 'execute' )
+ 			->with( $this->identicalTo( 2 ) )
+-			->will( $this->returnValue( 1 ) );
++			->willReturn( 1 );
+ 
+ 		$first  = $mock->get( 2 );
+ 		$second = $mock->get( 2 );
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php
+index 7aa7982aa6..1ed005e259 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php
+@@ -62,6 +62,10 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
+ 	private function setup_widget( $id_base, $number, $settings ) {
+ 		global $wp_widget_factory;
+ 
++		wp_widgets_init();
++		if ( null === $wp_widget_factory->get_widget_object( $id_base ) && 'text' === $id_base ) {
++			register_widget( 'WP_Widget_Text' );
++		}
+ 		$option_name = "widget_$id_base";
+ 		update_option(
+ 			$option_name,
+@@ -608,6 +612,10 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
+ 	 */
+ 	public function test_encode_form_data_no_raw() {
+ 		global $wp_widget_factory;
++		wp_widgets_init();
++		if ( ! isset( $wp_widget_factory->widgets['WP_Widget_Search'] ) ) {
++			register_widget( 'WP_Widget_Search' );
++		}
+ 		wp_set_current_user( self::$admin_id );
+ 		$wp_widget_factory->widgets['WP_Widget_Search']->widget_options['show_instance_in_rest'] = false;
+ 		$request = new WP_REST_Request( 'POST', '/wp/v2/widget-types/search/encode' );
+diff --git a/tests/phpunit/tests/template.php b/tests/phpunit/tests/template.php
+index c798d38bb7..bced665932 100644
+--- a/tests/phpunit/tests/template.php
++++ b/tests/phpunit/tests/template.php
+@@ -1695,8 +1695,8 @@ class Tests_Template extends WP_UnitTestCase {
+ 					$block_separator_custom_style_span = null;
+ 					$processor = new class( $filtered_buffer ) extends WP_HTML_Tag_Processor {
+ 						public function get_span(): WP_HTML_Span {
+-							(new static(__FUNCTION__))->set_bookmark( 'here' );
+-							return (new static(__FUNCTION__))->bookmarks['here'];
++							$this->set_bookmark( 'here' );
++							return $this->bookmarks['here'];
+ 						}
+ 					};
+ 					while ( $processor->next_tag() ) {

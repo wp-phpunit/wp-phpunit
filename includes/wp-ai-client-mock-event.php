@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mock Event for testing.
  *
@@ -13,5 +14,4 @@
  *
  * @since 7.0.0
  */
-class WP_AI_Client_Mock_Event {
-}
+class WP_AI_Client_Mock_Event {}

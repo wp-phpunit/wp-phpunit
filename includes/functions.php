@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/class-basic-object.php';
 
 /**
@@ -6,32 +7,34 @@ require_once __DIR__ . '/class-basic-object.php';
  *
  * @return double The version number.
  */
-function tests_get_phpunit_version() {
-	if ( class_exists( 'PHPUnit\Runner\Version' ) ) {
-		$version = PHPUnit\Runner\Version::id();
-	} elseif ( class_exists( 'PHPUnit_Runner_Version' ) ) {
-		$version = PHPUnit_Runner_Version::id();
-	} else {
-		$version = 0;
-	}
+function tests_get_phpunit_version()
+{
+    if (class_exists(PHPUnit\Runner\Version::class)) {
+        $version = PHPUnit\Runner\Version::id();
+    } elseif (class_exists('PHPUnit_Runner_Version')) {
+        $version = PHPUnit_Runner_Version::id();
+    } else {
+        $version = 0;
+    }
 
-	return $version;
+    return $version;
 }
 
 /**
  * Resets various `$_SERVER` variables that can get altered during tests.
  */
-function tests_reset__SERVER() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
-	$_SERVER['HTTP_HOST']       = WP_TESTS_DOMAIN;
-	$_SERVER['REMOTE_ADDR']     = '127.0.0.1';
-	$_SERVER['REQUEST_METHOD']  = 'GET';
-	$_SERVER['REQUEST_URI']     = '';
-	$_SERVER['SERVER_NAME']     = WP_TESTS_DOMAIN;
-	$_SERVER['SERVER_PORT']     = '80';
-	$_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+function tests_reset__SERVER() // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
+{
+    $_SERVER['HTTP_HOST']       = WP_TESTS_DOMAIN;
+    $_SERVER['REMOTE_ADDR']     = '127.0.0.1';
+    $_SERVER['REQUEST_METHOD']  = 'GET';
+    $_SERVER['REQUEST_URI']     = '';
+    $_SERVER['SERVER_NAME']     = WP_TESTS_DOMAIN;
+    $_SERVER['SERVER_PORT']     = '80';
+    $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
 
-	unset( $_SERVER['HTTP_REFERER'] );
-	unset( $_SERVER['HTTPS'] );
+    unset($_SERVER['HTTP_REFERER']);
+    unset($_SERVER['HTTPS']);
 }
 
 /**
@@ -52,21 +55,22 @@ function tests_reset__SERVER() { // phpcs:ignore WordPress.NamingConventions.Val
  * @param int      $accepted_args Optional. The number of arguments the function accepts. Default 1.
  * @return true Always returns true.
  */
-function tests_add_filter( $hook_name, $callback, $priority = 10, $accepted_args = 1 ) {
-	global $wp_filter;
+function tests_add_filter($hook_name, $callback, $priority = 10, $accepted_args = 1)
+{
+    global $wp_filter;
 
-	if ( function_exists( 'add_filter' ) ) {
-		add_filter( $hook_name, $callback, $priority, $accepted_args );
-	} else {
-		$idx = _test_filter_build_unique_id( $hook_name, $callback, $priority );
+    if (\function_exists('add_filter')) {
+        add_filter($hook_name, $callback, $priority, $accepted_args);
+    } else {
+        $idx = _test_filter_build_unique_id($hook_name, $callback, $priority);
 
-		$wp_filter[ $hook_name ][ $priority ][ $idx ] = array(
-			'function'      => $callback,
-			'accepted_args' => $accepted_args,
-		);
-	}
+        $wp_filter[ $hook_name ][ $priority ][ $idx ] = [
+            'function'      => $callback,
+            'accepted_args' => $accepted_args,
+        ];
+    }
 
-	return true;
+    return true;
 }
 
 /**
@@ -83,77 +87,80 @@ function tests_add_filter( $hook_name, $callback, $priority = 10, $accepted_args
  *                                         associated with a particular action are executed.
  * @return string Unique function ID for usage as array key.
  */
-function _test_filter_build_unique_id( $hook_name, $callback, $priority ) {
-	if ( is_string( $callback ) ) {
-		return $callback;
-	}
+function _test_filter_build_unique_id($hook_name, $callback, $priority)
+{
+    if (\is_string($callback)) {
+        return $callback;
+    }
 
-	if ( is_object( $callback ) ) {
-		// Closures are currently implemented as objects.
-		$callback = array( $callback, '' );
-	} else {
-		$callback = (array) $callback;
-	}
+    if (\is_object($callback)) {
+        // Closures are currently implemented as objects.
+        $callback = [ $callback, '' ];
+    } else {
+        $callback = (array) $callback;
+    }
 
-	if ( is_object( $callback[0] ) ) {
-		// Object class calling.
-		return spl_object_hash( $callback[0] ) . $callback[1];
-	} elseif ( is_string( $callback[0] ) ) {
-		// Static calling.
-		return $callback[0] . '::' . $callback[1];
-	}
+    if (\is_object($callback[0])) {
+        // Object class calling.
+        return spl_object_hash($callback[0]) . $callback[1];
+    } elseif (\is_string($callback[0])) {
+        // Static calling.
+        return $callback[0] . '::' . $callback[1];
+    }
 }
 
 /**
  * Deletes all data from the database.
  */
-function _delete_all_data() {
-	global $wpdb;
+function _delete_all_data()
+{
+    global $wpdb;
 
-	foreach ( array(
-		$wpdb->posts,
-		$wpdb->postmeta,
-		$wpdb->comments,
-		$wpdb->commentmeta,
-		$wpdb->term_relationships,
-		$wpdb->termmeta,
-	) as $table ) {
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "DELETE FROM {$table}" );
-	}
+    foreach ([
+        $wpdb->posts,
+        $wpdb->postmeta,
+        $wpdb->comments,
+        $wpdb->commentmeta,
+        $wpdb->term_relationships,
+        $wpdb->termmeta,
+    ] as $table) {
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $wpdb->query("DELETE FROM {$table}");
+    }
 
-	foreach ( array(
-		$wpdb->terms,
-		$wpdb->term_taxonomy,
-	) as $table ) {
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "DELETE FROM {$table} WHERE term_id != 1" );
-	}
+    foreach ([
+        $wpdb->terms,
+        $wpdb->term_taxonomy,
+    ] as $table) {
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $wpdb->query("DELETE FROM {$table} WHERE term_id != 1");
+    }
 
-	$wpdb->query( "UPDATE {$wpdb->term_taxonomy} SET count = 0" );
+    $wpdb->query("UPDATE {$wpdb->term_taxonomy} SET count = 0");
 
-	$wpdb->query( "DELETE FROM {$wpdb->users} WHERE ID != 1" );
-	$wpdb->query( "DELETE FROM {$wpdb->usermeta} WHERE user_id != 1" );
+    $wpdb->query("DELETE FROM {$wpdb->users} WHERE ID != 1");
+    $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE user_id != 1");
 }
 
 /**
  * Deletes all posts from the database.
  */
-function _delete_all_posts() {
-	global $wpdb;
+function _delete_all_posts()
+{
+    global $wpdb;
 
-	$all_posts = $wpdb->get_results( "SELECT ID, post_type from {$wpdb->posts}", ARRAY_A );
-	if ( ! $all_posts ) {
-		return;
-	}
+    $all_posts = $wpdb->get_results("SELECT ID, post_type from {$wpdb->posts}", ARRAY_A);
+    if (! $all_posts) {
+        return;
+    }
 
-	foreach ( $all_posts as $data ) {
-		if ( 'attachment' === $data['post_type'] ) {
-			wp_delete_attachment( $data['ID'], true );
-		} else {
-			wp_delete_post( $data['ID'], true );
-		}
-	}
+    foreach ($all_posts as $data) {
+        if ('attachment' === $data['post_type']) {
+            wp_delete_attachment($data['ID'], true);
+        } else {
+            wp_delete_post($data['ID'], true);
+        }
+    }
 }
 
 /**
@@ -166,12 +173,13 @@ function _delete_all_posts() {
  * @param string          $title   Error title.
  * @param array           $args    Arguments passed to wp_die().
  */
-function _wp_die_handler( $message, $title = '', $args = array() ) {
-	if ( ! $GLOBALS['_wp_die_disabled'] ) {
-		_wp_die_handler_txt( $message, $title, $args );
-	} else {
-		// Ignore at our peril.
-	}
+function _wp_die_handler($message, $title = '', $args = [])
+{
+    if (! $GLOBALS['_wp_die_disabled']) {
+        _wp_die_handler_txt($message, $title, $args);
+    } else {
+        // Ignore at our peril.
+    }
 }
 
 /**
@@ -179,8 +187,9 @@ function _wp_die_handler( $message, $title = '', $args = array() ) {
  *
  * @since UT (3.7.0)
  */
-function _disable_wp_die() {
-	$GLOBALS['_wp_die_disabled'] = true;
+function _disable_wp_die()
+{
+    $GLOBALS['_wp_die_disabled'] = true;
 }
 
 /**
@@ -188,8 +197,9 @@ function _disable_wp_die() {
  *
  * @since UT (3.7.0)
  */
-function _enable_wp_die() {
-	$GLOBALS['_wp_die_disabled'] = false;
+function _enable_wp_die()
+{
+    $GLOBALS['_wp_die_disabled'] = false;
 }
 
 /**
@@ -199,8 +209,9 @@ function _enable_wp_die() {
  *
  * @return string The die handler.
  */
-function _wp_die_handler_filter() {
-	return '_wp_die_handler';
+function _wp_die_handler_filter()
+{
+    return '_wp_die_handler';
 }
 
 /**
@@ -210,8 +221,9 @@ function _wp_die_handler_filter() {
  *
  * @return string The die handler.
  */
-function _wp_die_handler_filter_exit() {
-	return '_wp_die_handler_exit';
+function _wp_die_handler_filter_exit()
+{
+    return '_wp_die_handler_exit';
 }
 
 /**
@@ -224,31 +236,32 @@ function _wp_die_handler_filter_exit() {
  * @param string          $title   Error title.
  * @param array           $args    Arguments passed to wp_die().
  */
-function _wp_die_handler_txt( $message, $title, $args ) {
-	list( $message, $title, $args ) = _wp_die_process_input( $message, $title, $args );
+function _wp_die_handler_txt($message, $title, $args)
+{
+    [$message, $title, $args] = _wp_die_process_input($message, $title, $args);
 
-	$message = html_entity_decode( strip_tags( $message ) );
-	$title   = html_entity_decode( strip_tags( $title ) );
+    $message = html_entity_decode(strip_tags($message));
+    $title   = html_entity_decode(strip_tags($title));
 
-	echo "\033[0;31m";
-	echo "\nwp_die() called\n";
-	echo "Message: $message\n";
-	echo "\033[0m";
+    echo "\033[0;31m";
+    echo "\nwp_die() called\n";
+    echo "Message: $message\n";
+    echo "\033[0m";
 
-	if ( ! empty( $title ) ) {
-		echo "Title: $title\n";
-	}
+    if (! empty($title)) {
+        echo "Title: $title\n";
+    }
 
-	if ( ! empty( $args ) ) {
-		echo "Args:\n";
-		foreach ( $args as $key => $value ) {
-			if ( ! is_scalar( $value ) ) {
-				$value = var_export( $value, true );
-			}
+    if (! empty($args)) {
+        echo "Args:\n";
+        foreach ($args as $key => $value) {
+            if (! \is_scalar($value)) {
+                $value = var_export($value, true);
+            }
 
-			echo "\t$key: $value\n";
-		}
-	}
+            echo "\t$key: $value\n";
+        }
+    }
 }
 
 /**
@@ -261,33 +274,34 @@ function _wp_die_handler_txt( $message, $title, $args ) {
  * @param string          $title   Error title.
  * @param array           $args    Arguments passed to wp_die().
  */
-function _wp_die_handler_exit( $message, $title, $args ) {
-	list( $message, $title, $args ) = _wp_die_process_input( $message, $title, $args );
+function _wp_die_handler_exit($message, $title, $args)
+{
+    [$message, $title, $args] = _wp_die_process_input($message, $title, $args);
 
-	$message = html_entity_decode( strip_tags( $message ) );
-	$title   = html_entity_decode( strip_tags( $title ) );
+    $message = html_entity_decode(strip_tags($message));
+    $title   = html_entity_decode(strip_tags($title));
 
-	echo "\033[0;31m";
-	echo "\nwp_die() called\n";
-	echo "Message: $message\n";
-	echo "\033[0m";
+    echo "\033[0;31m";
+    echo "\nwp_die() called\n";
+    echo "Message: $message\n";
+    echo "\033[0m";
 
-	if ( ! empty( $title ) ) {
-		echo "Title: $title\n";
-	}
+    if (! empty($title)) {
+        echo "Title: $title\n";
+    }
 
-	if ( ! empty( $args ) ) {
-		echo "Args:\n";
-		foreach ( $args as $key => $value ) {
-			if ( ! is_scalar( $value ) ) {
-				$value = var_export( $value, true );
-			}
+    if (! empty($args)) {
+        echo "Args:\n";
+        foreach ($args as $key => $value) {
+            if (! \is_scalar($value)) {
+                $value = var_export($value, true);
+            }
 
-			echo "\t$key: $value\n";
-		}
-	}
+            echo "\t$key: $value\n";
+        }
+    }
 
-	exit( 1 );
+    exit(1);
 }
 
 /**
@@ -298,8 +312,9 @@ function _wp_die_handler_exit( $message, $title, $args ) {
  *
  * @since 4.2.0
  */
-function _set_default_permalink_structure_for_tests() {
-	update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+function _set_default_permalink_structure_for_tests()
+{
+    update_option('permalink_structure', '/%year%/%monthnum%/%day%/%postname%/');
 }
 
 /**
@@ -307,14 +322,55 @@ function _set_default_permalink_structure_for_tests() {
  *
  * @return array The altered array.
  */
-function _upload_dir_no_subdir( $uploads ) {
-	$subdir = $uploads['subdir'];
+function wp_tests_copy_directory(string $source, string $destination): void
+{
+    if (! is_dir($destination) && ! mkdir($destination, 0777, true) && ! is_dir($destination)) {
+        throw new RuntimeException('Could not create ParaTest data directory: ' . $destination);
+    }
 
-	$uploads['subdir'] = '';
-	$uploads['path']   = str_replace( $subdir, '', $uploads['path'] );
-	$uploads['url']    = str_replace( $subdir, '', $uploads['url'] );
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST,
+    );
 
-	return $uploads;
+    foreach ($iterator as $item) {
+        $target = $destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName();
+        if ($item->isDir()) {
+            if (! is_dir($target) && ! mkdir($target, 0777, true) && ! is_dir($target)) {
+                throw new RuntimeException('Could not create ParaTest data directory: ' . $target);
+            }
+            continue;
+        }
+
+        if (! copy($item->getPathname(), $target)) {
+            throw new RuntimeException('Could not copy ParaTest test data file: ' . $item->getPathname());
+        }
+    }
+}
+
+function _wp_tests_paratest_upload_dir($uploads)
+{
+    $token = getenv('TEST_TOKEN');
+    if (false === $token || '' === $token) {
+        return $uploads;
+    }
+
+    $worker = '.paratest-' . preg_replace('/[^0-9A-Za-z_]/', '_', $token);
+    $uploads['basedir'] .= '/' . $worker;
+    $uploads['path']     = $uploads['basedir'] . $uploads['subdir'];
+
+    return $uploads;
+}
+
+function _upload_dir_no_subdir($uploads)
+{
+    $subdir = $uploads['subdir'];
+
+    $uploads['subdir'] = '';
+    $uploads['path']   = str_replace($subdir, '', $uploads['path']);
+    $uploads['url']    = str_replace($subdir, '', $uploads['url']);
+
+    return $uploads;
 }
 
 /**
@@ -322,11 +378,12 @@ function _upload_dir_no_subdir( $uploads ) {
  *
  * @return array The altered array.
  */
-function _upload_dir_https( $uploads ) {
-	$uploads['url']     = str_replace( 'http://', 'https://', $uploads['url'] );
-	$uploads['baseurl'] = str_replace( 'http://', 'https://', $uploads['baseurl'] );
+function _upload_dir_https($uploads)
+{
+    $uploads['url']     = str_replace('http://', 'https://', $uploads['url']);
+    $uploads['baseurl'] = str_replace('http://', 'https://', $uploads['baseurl']);
 
-	return $uploads;
+    return $uploads;
 }
 
 /**
@@ -334,13 +391,14 @@ function _upload_dir_https( $uploads ) {
  *
  * @return string The server class name.
  */
-function _wp_rest_server_class_filter() {
-	return 'Spy_REST_Server';
+function _wp_rest_server_class_filter()
+{
+    return 'Spy_REST_Server';
 }
 
 // Skip `setcookie` calls in auth_cookie functions due to warning:
 // Cannot modify header information - headers already sent by...
-tests_add_filter( 'send_auth_cookies', '__return_false' );
+tests_add_filter('send_auth_cookies', '__return_false');
 
 /**
  * After the init action has been run once, trying to re-register block types can cause
@@ -348,21 +406,22 @@ tests_add_filter( 'send_auth_cookies', '__return_false' );
  *
  * @since 5.0.0
  */
-function _unhook_block_registration() {
-	// Block types.
-	require __DIR__ . '/unregister-blocks-hooks.php';
-	remove_action( 'init', 'register_core_block_types_from_metadata' );
-	remove_action( 'init', 'register_block_core_legacy_widget' );
-	remove_action( 'init', 'register_block_core_widget_group' );
-	remove_action( 'init', 'register_core_block_types_from_metadata' );
+function _unhook_block_registration()
+{
+    // Block types.
+    require __DIR__ . '/unregister-blocks-hooks.php';
+    remove_action('init', 'register_core_block_types_from_metadata');
+    remove_action('init', 'register_block_core_legacy_widget');
+    remove_action('init', 'register_block_core_widget_group');
+    remove_action('init', 'register_core_block_types_from_metadata');
 
-	// Block binding sources.
-	remove_action( 'init', '_register_block_bindings_pattern_overrides_source' );
-	remove_action( 'init', '_register_block_bindings_post_data_source' );
-	remove_action( 'init', '_register_block_bindings_post_meta_source' );
-	remove_action( 'init', '_register_block_bindings_term_data_source' );
+    // Block binding sources.
+    remove_action('init', '_register_block_bindings_pattern_overrides_source');
+    remove_action('init', '_register_block_bindings_post_data_source');
+    remove_action('init', '_register_block_bindings_post_meta_source');
+    remove_action('init', '_register_block_bindings_term_data_source');
 }
-tests_add_filter( 'init', '_unhook_block_registration', 1000 );
+tests_add_filter('init', '_unhook_block_registration', 1000);
 
 /**
  * After the init action has been run once, trying to re-register font collections can cause
@@ -370,10 +429,11 @@ tests_add_filter( 'init', '_unhook_block_registration', 1000 );
  *
  * @since 6.5.0
  */
-function _unhook_font_registration() {
-	remove_action( 'init', '_wp_register_default_font_collections' );
+function _unhook_font_registration()
+{
+    remove_action('init', '_wp_register_default_font_collections');
 }
-tests_add_filter( 'init', '_unhook_font_registration', 1000 );
+tests_add_filter('init', '_unhook_font_registration', 1000);
 
 /**
  * After the init action has been run once, trying to re-register connector settings can cause
@@ -381,11 +441,12 @@ tests_add_filter( 'init', '_unhook_font_registration', 1000 );
  *
  * @since 7.0.0
  */
-function _unhook_connector_registration() {
-	remove_action( 'init', '_wp_register_default_connector_settings', 20 );
-	remove_action( 'init', '_wp_connectors_pass_default_keys_to_ai_client', 20 );
+function _unhook_connector_registration()
+{
+    remove_action('init', '_wp_register_default_connector_settings', 20);
+    remove_action('init', '_wp_connectors_pass_default_keys_to_ai_client', 20);
 }
-tests_add_filter( 'init', '_unhook_connector_registration', 1000 );
+tests_add_filter('init', '_unhook_connector_registration', 1000);
 
 /**
  * Before the abilities API categories init action runs, unhook the core ability
@@ -394,10 +455,11 @@ tests_add_filter( 'init', '_unhook_connector_registration', 1000 );
  *
  * @since 6.9.0
  */
-function _unhook_core_ability_categories_registration() {
-	remove_action( 'wp_abilities_api_categories_init', 'wp_register_core_ability_categories' );
+function _unhook_core_ability_categories_registration()
+{
+    remove_action('wp_abilities_api_categories_init', 'wp_register_core_ability_categories');
 }
-tests_add_filter( 'wp_abilities_api_categories_init', '_unhook_core_ability_categories_registration', 1 );
+tests_add_filter('wp_abilities_api_categories_init', '_unhook_core_ability_categories_registration', 1);
 
 /**
  * Before the abilities API init action runs, unhook the core abilities
@@ -405,7 +467,8 @@ tests_add_filter( 'wp_abilities_api_categories_init', '_unhook_core_ability_cate
  *
  * @since 6.9.0
  */
-function _unhook_core_abilities_registration() {
-	remove_action( 'wp_abilities_api_init', 'wp_register_core_abilities' );
+function _unhook_core_abilities_registration()
+{
+    remove_action('wp_abilities_api_init', 'wp_register_core_abilities');
 }
-tests_add_filter( 'wp_abilities_api_init', '_unhook_core_abilities_registration', 1 );
+tests_add_filter('wp_abilities_api_init', '_unhook_core_abilities_registration', 1);

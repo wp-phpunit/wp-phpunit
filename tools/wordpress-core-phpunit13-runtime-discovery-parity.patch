@@ -1,0 +1,37 @@
+diff --git a/phpunit.xml.dist b/phpunit.xml.dist
+--- a/phpunit.xml.dist
++++ b/phpunit.xml.dist
+@@ -17,7 +17,6 @@
+       <exclude>tests/phpunit/tests/image/resize.php</exclude>
+       <exclude>tests/phpunit/tests/media/testcase-adjacent-image-link.php</exclude>
+ 	  <exclude>tests/phpunit/tests/multisite/populateNetworkHooks.php</exclude>
+-      <exclude>tests/phpunit/tests/query/verboseRewriteRules.php</exclude>
+       <exclude>tests/phpunit/tests/rest-api/rest-test-controller.php</exclude>
+       <exclude>tests/phpunit/tests/theme/base.php</exclude>
+     </testsuite>
+diff --git a/tests/phpunit/includes/bootstrap-phpunit13.php b/tests/phpunit/includes/bootstrap-phpunit13.php
+--- a/tests/phpunit/includes/bootstrap-phpunit13.php
++++ b/tests/phpunit/includes/bootstrap-phpunit13.php
+@@ -16,7 +16,6 @@ $supportFiles = array(
+ 	'../tests/image/base.php',
+ 	'../tests/image/resize.php',
+ 	'../tests/media/testcase-adjacent-image-link.php',
+-	'../tests/query/verboseRewriteRules.php',
+ 	'../tests/rest-api/rest-test-controller.php',
+ 	'../tests/theme/base.php',
+ );
+diff --git a/tests/phpunit/multisite.xml b/tests/phpunit/multisite.xml
+--- a/tests/phpunit/multisite.xml
++++ b/tests/phpunit/multisite.xml
+@@ -29,7 +29,6 @@
+       <exclude>tests/image/base.php</exclude>
+       <exclude>tests/image/resize.php</exclude>
+       <exclude>tests/media/testcase-adjacent-image-link.php</exclude>
+-      <exclude>tests/query/verboseRewriteRules.php</exclude>
+       <exclude>tests/rest-api/rest-test-controller.php</exclude>
+       <exclude>tests/theme/base.php</exclude>
+ 		</testsuite>
+diff --git a/tests/phpunit/tests/query/verboseRewriteRules.php b/tests/phpunit/tests/query/Tests_Query_VerbosePageRules.php
+similarity index 100%
+rename from tests/phpunit/tests/query/verboseRewriteRules.php
+rename to tests/phpunit/tests/query/Tests_Query_VerbosePageRules.php

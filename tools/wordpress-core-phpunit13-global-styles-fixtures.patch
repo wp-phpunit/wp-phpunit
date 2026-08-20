@@ -1,0 +1,44 @@
+--- a/tests/phpunit/tests/rest-api/WP_REST_Global_Styles_Revisions_Controller_Test.php
++++ b/tests/phpunit/tests/rest-api/WP_REST_Global_Styles_Revisions_Controller_Test.php
+@@ -210,6 +210,9 @@
+ 	 */
+ 	public function set_up() {
+ 		parent::set_up();
++		if ( ! WP_Block_Type_Registry::get_instance()->is_registered( 'core/group' ) ) {
++			register_core_block_types_from_metadata();
++		}
+ 		switch_theme( 'tt1-blocks' );
+ 		$revisions             = wp_get_post_revisions( self::$global_styles_id );
+ 		$this->total_revisions = count( $revisions );
+@@ -994,6 +997,7 @@
+ 	public function test_get_item_preserves_block_style_variations() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
++		wp_register_block_style_variations_from_theme_json_partials( WP_Theme_JSON_Resolver::get_style_variations( 'block' ) );
+ 
+ 		// Create a global styles post for the theme.
+ 		$global_styles_id = wp_insert_post(
+@@ -1081,6 +1085,7 @@
+ 	public function test_multiple_block_variations_are_preserved() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
++		wp_register_block_style_variations_from_theme_json_partials( WP_Theme_JSON_Resolver::get_style_variations( 'block' ) );
+ 
+ 		// Create a global styles post for the theme.
+ 		$global_styles_id = wp_insert_post(
+@@ -1186,6 +1191,7 @@
+ 	public function test_theme_variations_are_registered_for_revisions() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
++		wp_register_block_style_variations_from_theme_json_partials( WP_Theme_JSON_Resolver::get_style_variations( 'block' ) );
+ 
+ 		// Verify the theme has a block style variation defined.
+ 		$theme_variations = WP_Theme_JSON_Resolver::get_style_variations( 'block' );
+@@ -1270,6 +1276,7 @@
+ 	public function test_get_items_preserves_block_style_variations() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
++		wp_register_block_style_variations_from_theme_json_partials( WP_Theme_JSON_Resolver::get_style_variations( 'block' ) );
+ 
+ 		// Create a global styles post for the theme.
+ 		$global_styles_id = wp_insert_post(

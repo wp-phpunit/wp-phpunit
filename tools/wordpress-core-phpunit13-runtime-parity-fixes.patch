@@ -1,0 +1,207 @@
+diff --git a/tests/phpunit/tests/admin/includesPost.php b/tests/phpunit/tests/admin/includesPost.php
+index f0db361..94f7aa3 100644
+--- a/tests/phpunit/tests/admin/includesPost.php
++++ b/tests/phpunit/tests/admin/includesPost.php
+@@ -1183,11 +1183,11 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			$this->assertExpectedPhpDeprecations(
+ 				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
+ 				static function () use ( $title, $post_type, &$actual ) {
+-					$actual = post_exists( $title, '', '', $post_type );
++					$actual = post_exists( $title, null, null, $post_type );
+ 				}
+ 			);
+ 		} else {
+-			$actual = post_exists( $title, '', '', $post_type );
++			$actual = post_exists( $title, null, null, $post_type );
+ 		}
+ 		$this->assertSame( $post_id, $actual );
+ 	}
+@@ -1211,11 +1211,11 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			$this->assertExpectedPhpDeprecations(
+ 				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
+ 				static function () use ( $title, &$actual ) {
+-					$actual = post_exists( $title, '', '', 'post' );
++					$actual = post_exists( $title, null, null, 'post' );
+ 				}
+ 			);
+ 		} else {
+-			$actual = post_exists( $title, '', '', 'post' );
++			$actual = post_exists( $title, null, null, 'post' );
+ 		}
+ 		$this->assertSame( 0, $actual );
+ 	}
+@@ -1241,11 +1241,11 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			$this->assertExpectedPhpDeprecations(
+ 				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
+ 				static function () use ( $title, $post_status, &$actual ) {
+-					$actual = post_exists( $title, '', '', '', $post_status );
++					$actual = post_exists( $title, null, null, null, $post_status );
+ 				}
+ 			);
+ 		} else {
+-			$actual = post_exists( $title, '', '', '', $post_status );
++			$actual = post_exists( $title, null, null, null, $post_status );
+ 		}
+ 		$this->assertSame( $post_id, $actual );
+ 	}
+@@ -1272,11 +1272,11 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			$this->assertExpectedPhpDeprecations(
+ 				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
+ 				static function () use ( $title, $post_type, $post_status, &$actual ) {
+-					$actual = post_exists( $title, '', '', $post_type, $post_status );
++					$actual = post_exists( $title, null, null, $post_type, $post_status );
+ 				}
+ 			);
+ 		} else {
+-			$actual = post_exists( $title, '', '', $post_type, $post_status );
++			$actual = post_exists( $title, null, null, $post_type, $post_status );
+ 		}
+ 		$this->assertSame( $post_id, $actual );
+ 	}
+@@ -1302,11 +1302,11 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			$this->assertExpectedPhpDeprecations(
+ 				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
+ 				static function () use ( $title, &$actual ) {
+-					$actual = post_exists( $title, '', '', '', 'publish' );
++					$actual = post_exists( $title, null, null, null, 'publish' );
+ 				}
+ 			);
+ 		} else {
+-			$actual = post_exists( $title, '', '', '', 'publish' );
++			$actual = post_exists( $title, null, null, null, 'publish' );
+ 		}
+ 		$this->assertSame( 0, $actual );
+ 	}
+@@ -1333,13 +1333,13 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			$this->assertExpectedPhpDeprecations(
+ 				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
+ 				static function () use ( $title, $post_type, $post_status, &$actual ) {
+-					$actual[] = post_exists( $title, '', '', $post_type, 'draft' );
+-					$actual[] = post_exists( $title, '', '', 'wp_tests', $post_status );
++					$actual[] = post_exists( $title, null, null, $post_type, 'draft' );
++					$actual[] = post_exists( $title, null, null, 'wp_tests', $post_status );
+ 				}
+ 			);
+ 		} else {
+-			$actual[] = post_exists( $title, '', '', $post_type, 'draft' );
+-			$actual[] = post_exists( $title, '', '', 'wp_tests', $post_status );
++			$actual[] = post_exists( $title, null, null, $post_type, 'draft' );
++			$actual[] = post_exists( $title, null, null, 'wp_tests', $post_status );
+ 		}
+ 
+ 		$this->assertSame( 0, $actual[0] );
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php
+index f42f700..0e95922 100644
+--- a/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php
+@@ -69,7 +69,7 @@ class Tests_Admin_WPPluginDependencies_GetDependencyFilepath extends WP_PluginDe
+ 	 *
+ 	 * @return array[]
+ 	 */
+-	public function data_get_dependency_filepath() {
++	public static function data_get_dependency_filepath() {
+ 		return array(
+ 			'no plugins'                      => array(
+ 				'dependency_slug' => 'dependency',
+@@ -85,7 +85,7 @@ class Tests_Admin_WPPluginDependencies_GetDependencyFilepath extends WP_PluginDe
+ 				'expected'        => false,
+ 			),
+ 			'a plugin that ends with slug/'   => array(
+-				'dependency_slugs' => 'dependency',
++				'dependency_slug'  => 'dependency',
+ 				'plugins'          => array(
+ 					'addon-for-dependency/dependency.php' => array( 'RequiresPlugins' => '' ),
+ 					'dependent/dependent.php'             => array( 'RequiresPlugins' => 'dependency' ),
+@@ -93,7 +93,7 @@ class Tests_Admin_WPPluginDependencies_GetDependencyFilepath extends WP_PluginDe
+ 				'expected'         => false,
+ 			),
+ 			'a plugin that does not exist'    => array(
+-				'dependency_slugs' => 'dependency2',
++				'dependency_slug'  => 'dependency2',
+ 				'plugins'          => array(
+ 					'dependency/dependency.php' => array( 'RequiresPlugins' => '' ),
+ 					'dependent/dependent.php'   => array( 'RequiresPlugins' => 'dependency2' ),
+@@ -101,7 +101,7 @@ class Tests_Admin_WPPluginDependencies_GetDependencyFilepath extends WP_PluginDe
+ 				'expected'         => false,
+ 			),
+ 			'a plugin that exists'            => array(
+-				'dependency_slugs' => 'dependency',
++				'dependency_slug'  => 'dependency',
+ 				'plugins'          => array(
+ 					'dependency/dependency.php' => array( 'RequiresPlugins' => '' ),
+ 					'dependent/dependent.php'   => array( 'RequiresPlugins' => 'dependency' ),
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php
+index b8fecf7..f4ad375 100644
+--- a/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php
+@@ -43,7 +43,7 @@ class Tests_Admin_WPPluginDependencies_GetDependentFilepath extends WP_PluginDep
+ 	 *
+ 	 * @return array[]
+ 	 */
+-	public function data_get_dependent_filepath() {
++	public static function data_get_dependent_filepath() {
+ 		return array(
+ 			'a plugin that exists'            => array(
+ 				'dependent_slug' => 'dependent',
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php b/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php
+index f883249..9d3b6a9 100644
+--- a/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php
++++ b/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php
+@@ -77,7 +77,7 @@ class Tests_Admin_WPPluginDependencies_HasCircularDependency extends WP_PluginDe
+ 	 *
+ 	 * @return array[]
+ 	 */
+-	public function data_circular_dependencies() {
++	public static function data_circular_dependencies() {
+ 		return array(
+ 			'a plugin that depends on itself' => array(
+ 				'plugin_to_check' => 'dependency/dependency.php',
+diff --git a/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php b/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php
+index 06f999b..ab64211 100644
+--- a/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php
++++ b/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php
+@@ -753,9 +753,13 @@ class REST_Block_Type_Controller_Test extends WP_Test_REST_Controller_Testcase {
+ 	 *
+ 	 * @param string $method HTTP method to use.
+ 	 */
++	public static function data_readable_http_methods_without_arguments() {
++		return array_fill_keys( array_keys( self::data_readable_http_methods() ), array() );
++	}
++
+ 	#[\PHPUnit\Framework\Attributes\Ticket('47620')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('56481')]
+-	#[\PHPUnit\Framework\Attributes\DataProvider('data_readable_http_methods')]
++	#[\PHPUnit\Framework\Attributes\DataProvider('data_readable_http_methods_without_arguments')]
+ 	public function test_prepare_item() {
+ 		$registry = new WP_Block_Type_Registry();
+ 		$settings = array(
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php
+index 615dd4f..af5e3f7 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php
+@@ -363,7 +363,11 @@ class WP_Test_REST_Search_Controller extends WP_Test_REST_Controller_Testcase {
+ 	 *
+ 	 * @param string $method HTTP method to use.
+ 	 */
+-	#[\PHPUnit\Framework\Attributes\DataProvider('data_readable_http_methods')]
++	public static function data_readable_http_methods_without_arguments() {
++		return array_fill_keys( array_keys( self::data_readable_http_methods() ), array() );
++	}
++
++	#[\PHPUnit\Framework\Attributes\DataProvider('data_readable_http_methods_without_arguments')]
+ 	public function test_get_items_search_type_post_subtype_invalid() {
+ 		$response = $this->do_request_with_params(
+ 			array(
+diff --git a/tests/phpunit/tests/script-modules/wpScriptModules.php b/tests/phpunit/tests/script-modules/wpScriptModules.php
+index bb35eff..4ddfb94 100644
+--- a/tests/phpunit/tests/script-modules/wpScriptModules.php
++++ b/tests/phpunit/tests/script-modules/wpScriptModules.php
+@@ -2522,7 +2522,7 @@ HTML;
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('63486')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_test_register_and_enqueue_script_module')]
+-	public function test_static_import_dependency_with_dynamic_imports_depending_on_static_import_dependency() {
++	public function test_static_import_dependency_with_dynamic_imports_depending_on_static_import_dependency( $use_global_function, $only_enqueue ) {
+ 		$get_dependency = function ( string $id, string $import ): array {
+ 			return compact( 'id', 'import' );
+ 		};

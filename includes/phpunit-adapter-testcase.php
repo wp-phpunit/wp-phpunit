@@ -1,19 +1,55 @@
 <?php
 
-use Yoast\PHPUnitPolyfills\TestCases\TestCase as Polyfill_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * PHPUnit adapter layer.
  *
- * This class enhances the PHPUnit native `TestCase` with polyfills
- * for assertions and expectation methods added between PHPUnit 4.8 - 9.6.
- *
- * Additionally, the Polyfill TestCase offers a workaround for the addition
- * of the `void` return type to PHPUnit fixture methods by providing
- * overloadable snake_case versions of the typical fixture method names and
- * ensuring that PHPUnit handles those correctly.
- *
- * See {@link https://github.com/Yoast/PHPUnit-Polyfills} for full
- * documentation on the available polyfills and other features.
+ * Connects PHPUnit 13 lifecycle methods to the WordPress test-library hooks.
+ * WordPress test cases override the snake_case hooks while PHPUnit itself only
+ * interacts with its native public lifecycle API.
  */
-abstract class PHPUnit_Adapter_TestCase extends Polyfill_TestCase {}
+abstract class PHPUnit_Adapter_TestCase extends TestCase
+{
+    final public static function setUpBeforeClass(): void
+    {
+        static::set_up_before_class();
+    }
+
+    public static function set_up_before_class() {}
+
+    final public static function tearDownAfterClass(): void
+    {
+        static::tear_down_after_class();
+    }
+
+    public static function tear_down_after_class() {}
+
+    final protected function setUp(): void
+    {
+        $this->set_up();
+    }
+
+    public function set_up() {}
+
+    final protected function assertPreConditions(): void
+    {
+        $this->assert_pre_conditions();
+    }
+
+    protected function assert_pre_conditions() {}
+
+    final protected function assertPostConditions(): void
+    {
+        $this->assert_post_conditions();
+    }
+
+    protected function assert_post_conditions() {}
+
+    final protected function tearDown(): void
+    {
+        $this->tear_down();
+    }
+
+    public function tear_down() {}
+}

@@ -1,0 +1,39 @@
+diff --git a/tests/phpunit/tests/filters.php b/tests/phpunit/tests/filters.php
+index 6fc0a85e1e..964113d7ef 100644
+--- a/tests/phpunit/tests/filters.php
++++ b/tests/phpunit/tests/filters.php
+@@ -162,7 +162,7 @@ class Tests_Filters extends WP_UnitTestCase {
+ 		$hook_name = __FUNCTION__;
+ 
+ 		if ( $expected_deprecation && PHP_VERSION_ID >= 80100 ) {
+-			$this->expectUserDeprecationMessage( $expected_deprecation );
++			$this->expectPhpDeprecationMessage( $expected_deprecation );
+ 		}
+ 
+ 		add_filter( $hook_name, array( $mock, 'filter' ), $priorities[0] );
+diff --git a/tests/phpunit/tests/hooks/applyFilters.php b/tests/phpunit/tests/hooks/applyFilters.php
+index b9c27a411e..12d4f11d95 100644
+--- a/tests/phpunit/tests/hooks/applyFilters.php
++++ b/tests/phpunit/tests/hooks/applyFilters.php
+@@ -64,7 +64,7 @@ class Tests_Hooks_ApplyFilters extends WP_UnitTestCase {
+ 		$hook_name = __FUNCTION__;
+ 
+ 		if ( $expected_deprecation && PHP_VERSION_ID >= 80100 ) {
+-			$this->expectUserDeprecationMessage( $expected_deprecation );
++			$this->expectPhpDeprecationMessage( $expected_deprecation );
+ 		}
+ 
+ 		$hook->add_filter( $hook_name, array( $mock, 'filter' ), $priorities[0], 1 );
+diff --git a/tests/phpunit/tests/hooks/doAction.php b/tests/phpunit/tests/hooks/doAction.php
+index dca9bd08ff..28988b9daa 100644
+--- a/tests/phpunit/tests/hooks/doAction.php
++++ b/tests/phpunit/tests/hooks/doAction.php
+@@ -106,7 +106,7 @@ class Tests_Hooks_DoAction extends WP_UnitTestCase {
+ 		$hook_name = __FUNCTION__;
+ 
+ 		if ( $expected_deprecation && PHP_VERSION_ID >= 80100 ) {
+-			$this->expectUserDeprecationMessage( $expected_deprecation );
++			$this->expectPhpDeprecationMessage( $expected_deprecation );
+ 		}
+ 
+ 		$hook->add_filter( $hook_name, array( $mock, 'action' ), $priorities[0], 1 );

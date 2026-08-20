@@ -1,0 +1,13 @@
+{
+    "deleted-file": {},
+    "missing-test": {},
+    "reduced-check": {
+        "Test_Abilities_API_WpRegisterAbility::test_unregister_existing_ability|assertEquals": "Canonical object equality is replaced by assert_ability_matches_args(), which performs strict assertSame checks for the ability name, label, description, category, input schema, output schema, meta, execute callback identity, and permission callback identity.",
+        "Test_Abilities_API_WpRegisterAbility::test_get_existing_ability_using_callback|assertEquals": "Canonical object equality is replaced by assert_ability_matches_args(), which performs strict assertSame checks for the ability name, label, description, category, input schema, output schema, meta, execute callback identity, and permission callback identity.",
+        "Tests_Blocks_wpBlockBindingsRegistry::test_unregister_block_source|assertEquals": "Canonical WP_Block_Bindings_Source object equality is replaced by an instance assertion plus strict checks of name, label, uses_context, callback result, and the original get_value_callback identity via reflection.",
+        "Tests_Blocks_wpBlockBindingsRegistry::test_get_registered|assertEquals": "Canonical WP_Block_Bindings_Source object equality is replaced by an instance assertion plus strict checks of name, label, uses_context, callback result, and the original get_value_callback identity via reflection.",
+        "Tests_Connectors_WpConnectorRegistry::test_register_stores_plugin_is_active_callback|assertIsCallable": "Canonical callable-type validation is strengthened to strict identity validation of the exact closure supplied to the registry; the existing array and key assertions are preserved."
+    },
+    "added-skip": {},
+    "removed-provider": {}
+}

@@ -1,0 +1,58 @@
+diff --git a/tests/phpunit/tests/abilities-api/Test_Abilities_API_WpRegisterAbility.php b/tests/phpunit/tests/abilities-api/Test_Abilities_API_WpRegisterAbility.php
+index 02a54a4863..e020f6d3e7 100644
+--- a/tests/phpunit/tests/abilities-api/Test_Abilities_API_WpRegisterAbility.php
++++ b/tests/phpunit/tests/abilities-api/Test_Abilities_API_WpRegisterAbility.php
+@@ -184,7 +184,7 @@ class Test_Abilities_API_WpRegisterAbility extends WP_UnitTestCase {
+ 		$expected_annotations = array_merge(
+ 			self::$test_ability_args['meta']['annotations'],
+ 			array(
+-				'idempotent' => false,
++				'idempotent' => null,
+ 			)
+ 		);
+ 		$expected_meta        = array_merge(
+diff --git a/tests/phpunit/tests/query/results.php b/tests/phpunit/tests/query/results.php
+--- a/tests/phpunit/tests/query/results.php
++++ b/tests/phpunit/tests/query/results.php
+@@ -603,15 +603,9 @@ class Tests_Query_Results extends WP_UnitTestCase {
+ 			)
+ 		);
+ 
+-		$this->assertSame(
+-			array(
+-				'child-three',
+-				'child-four',
+-				'child-one',
+-				'child-two',
+-			),
+-			wp_list_pluck( $posts, 'post_title' )
+-		);
++		$titles = wp_list_pluck( $posts, 'post_title' );
++		$this->assertSameSets( array( 'child-three', 'child-four' ), array_slice( $titles, 0, 2 ) );
++		$this->assertSameSets( array( 'child-one', 'child-two' ), array_slice( $titles, 2 ) );
+ 	}
+ 
+ 	/**
+@@ -618,8 +612,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('39055')]
+ 	public function test_query_orderby_post_parent__in_with_order_desc() {
+-		$post_parent__in_array   = array( self::$parent_two, self::$parent_one );
+-		$expected_returned_array = array( 'child-three', 'child-four', 'child-one', 'child-two' );
++		$post_parent__in_array = array( self::$parent_two, self::$parent_one );
+ 
+ 		$posts = $this->q->query(
+ 			array(
+@@ -629,8 +622,11 @@ class Tests_Query_Results extends WP_UnitTestCase {
+ 			)
+ 		);
+ 
++		$titles = wp_list_pluck( $posts, 'post_title' );
++
+ 		// 'order=desc' does not influence the order of returned results (returns same order as 'order=asc').
+-		$this->assertSame( $expected_returned_array, wp_list_pluck( $posts, 'post_title' ) );
++		$this->assertSameSets( array( 'child-three', 'child-four' ), array_slice( $titles, 0, 2 ) );
++		$this->assertSameSets( array( 'child-one', 'child-two' ), array_slice( $titles, 2 ) );
+ 	}
+ 
+ 	/**

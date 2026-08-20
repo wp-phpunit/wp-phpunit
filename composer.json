@@ -24,7 +24,48 @@
         "issues": "https://github.com/wp-phpunit/issues",
         "docs": "https://github.com/wp-phpunit/docs"
     },
+    "require": {
+        "php": "^8.5",
+        "phpunit/phpunit": "^13.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.6",
+        "phpcompatibility/php-compatibility": "^10.0@alpha",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.1",
+        "friendsofphp/php-cs-fixer": "^3.89",
+        "brianium/paratest": "^7.24"
+    },
     "autoload": {
         "files": ["__loaded.php"]
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse",
+        "compatibility": "phpcs --standard=phpcs.xml.dist",
+        "format": "php-cs-fixer fix --config=.php-cs-fixer.php",
+        "format:check": "php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --diff",
+        "rector:check": "rector process --dry-run",
+        "rector:fix": "rector process",
+        "core:test": "sh tools/run-wordpress-core-gate.sh all",
+        "core:audit": "sh tools/run-wordpress-core-gate.sh audit",
+        "core:test:single-site": "sh tools/run-wordpress-core-gate.sh single-site",
+        "core:test:multisite": "sh tools/run-wordpress-core-gate.sh multisite",
+        "core:test:multisite-subdomain": "sh tools/run-wordpress-core-gate.sh multisite-subdomain",
+        "core:test:external-object-cache": "sh tools/run-wordpress-core-gate.sh external-object-cache",
+        "core:test:html5lib": "sh tools/run-wordpress-core-gate.sh html5lib",
+        "core:test:ajax": "sh tools/run-wordpress-core-gate.sh ajax",
+        "core:test:ms-files": "sh tools/run-wordpress-core-gate.sh ms-files",
+        "quality": [
+            "@test",
+            "@compatibility",
+            "@format:check",
+            "@rector:check"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

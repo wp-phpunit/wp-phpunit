@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Trait for creating mock providers for testing.
  *
@@ -21,23 +22,24 @@ use WordPress\AiClient\Providers\Models\DTO\ModelMetadata;
  *
  * @since 7.0.0
  */
-class Mock_Connectors_Test_Provider_Availability implements ProviderAvailabilityInterface {
+class Mock_Connectors_Test_Provider_Availability implements ProviderAvailabilityInterface
+{
+    /**
+     * Whether the provider should report as configured.
+     *
+     * @var bool
+     */
+    public static bool $is_configured = true;
 
-	/**
-	 * Whether the provider should report as configured.
-	 *
-	 * @var bool
-	 */
-	public static bool $is_configured = true;
-
-	/**
-	 * Checks if the provider is configured.
-	 *
-	 * @return bool
-	 */
-	public function isConfigured(): bool {
-		return self::$is_configured;
-	}
+    /**
+     * Checks if the provider is configured.
+     *
+     * @return bool
+     */
+    public function isConfigured(): bool
+    {
+        return self::$is_configured;
+    }
 }
 
 /**
@@ -45,36 +47,39 @@ class Mock_Connectors_Test_Provider_Availability implements ProviderAvailability
  *
  * @since 7.0.0
  */
-class Mock_Connectors_Test_Model_Metadata_Directory implements ModelMetadataDirectoryInterface {
+class Mock_Connectors_Test_Model_Metadata_Directory implements ModelMetadataDirectoryInterface
+{
+    /**
+     * Lists model metadata.
+     *
+     * @return array Empty array.
+     */
+    public function listModelMetadata(): array
+    {
+        return [];
+    }
 
-	/**
-	 * Lists model metadata.
-	 *
-	 * @return array Empty array.
-	 */
-	public function listModelMetadata(): array {
-		return array();
-	}
+    /**
+     * Checks if a model exists.
+     *
+     * @param string $model_id The model ID.
+     * @return bool Always false.
+     */
+    public function hasModelMetadata(string $model_id): bool
+    {
+        return false;
+    }
 
-	/**
-	 * Checks if a model exists.
-	 *
-	 * @param string $model_id The model ID.
-	 * @return bool Always false.
-	 */
-	public function hasModelMetadata( string $model_id ): bool {
-		return false;
-	}
-
-	/**
-	 * Gets model metadata.
-	 *
-	 * @param string $model_id The model ID.
-	 * @throws \InvalidArgumentException Always, as no models are available.
-	 */
-	public function getModelMetadata( string $model_id ): ModelMetadata {
-		throw new \InvalidArgumentException( 'No models available.' );
-	}
+    /**
+     * Gets model metadata.
+     *
+     * @param string $model_id The model ID.
+     * @throws InvalidArgumentException Always, as no models are available.
+     */
+    public function getModelMetadata(string $model_id): ModelMetadata
+    {
+        throw new InvalidArgumentException('No models available.');
+    }
 }
 
 /**
@@ -87,54 +92,57 @@ class Mock_Connectors_Test_Model_Metadata_Directory implements ModelMetadataDire
  *
  * @since 7.0.0
  */
-class Mock_Connectors_Test_Provider extends AbstractProvider {
+class Mock_Connectors_Test_Provider extends AbstractProvider
+{
+    /**
+     * Creates the provider metadata.
+     *
+     * @return ProviderMetadata
+     */
+    protected static function createProviderMetadata(): ProviderMetadata
+    {
+        return new ProviderMetadata(
+            'mock-connectors-test',
+            'Mock Connectors Test',
+            ProviderTypeEnum::cloud(),
+            null,
+            RequestAuthenticationMethod::apiKey(),
+        );
+    }
 
-	/**
-	 * Creates the provider metadata.
-	 *
-	 * @return ProviderMetadata
-	 */
-	protected static function createProviderMetadata(): ProviderMetadata {
-		return new ProviderMetadata(
-			'mock-connectors-test',
-			'Mock Connectors Test',
-			ProviderTypeEnum::cloud(),
-			null,
-			RequestAuthenticationMethod::apiKey()
-		);
-	}
+    /**
+     * Creates the provider availability checker.
+     *
+     * @return ProviderAvailabilityInterface
+     */
+    protected static function createProviderAvailability(): ProviderAvailabilityInterface
+    {
+        return new Mock_Connectors_Test_Provider_Availability();
+    }
 
-	/**
-	 * Creates the provider availability checker.
-	 *
-	 * @return ProviderAvailabilityInterface
-	 */
-	protected static function createProviderAvailability(): ProviderAvailabilityInterface {
-		return new Mock_Connectors_Test_Provider_Availability();
-	}
+    /**
+     * Creates the model metadata directory.
+     *
+     * @return ModelMetadataDirectoryInterface
+     */
+    protected static function createModelMetadataDirectory(): ModelMetadataDirectoryInterface
+    {
+        return new Mock_Connectors_Test_Model_Metadata_Directory();
+    }
 
-	/**
-	 * Creates the model metadata directory.
-	 *
-	 * @return ModelMetadataDirectoryInterface
-	 */
-	protected static function createModelMetadataDirectory(): ModelMetadataDirectoryInterface {
-		return new Mock_Connectors_Test_Model_Metadata_Directory();
-	}
-
-	/**
-	 * Creates a model instance.
-	 *
-	 * @param ModelMetadata    $model_metadata    The model metadata.
-	 * @param ProviderMetadata $provider_metadata The provider metadata.
-	 * @throws \RuntimeException Always, as model creation is not needed for these tests.
-	 */
-	protected static function createModel(
-		ModelMetadata $model_metadata,
-		ProviderMetadata $provider_metadata
-	): ModelInterface {
-		throw new \RuntimeException( 'Not implemented.' );
-	}
+    /**
+     * Creates a model instance.
+     *
+     * @param ModelMetadata    $model_metadata    The model metadata.
+     * @param ProviderMetadata $provider_metadata The provider metadata.
+     * @throws RuntimeException Always, as model creation is not needed for these tests.
+     */
+    protected static function createModel(
+        ModelMetadata $model_metadata,
+        ProviderMetadata $provider_metadata,
+    ): ModelInterface {
+        throw new RuntimeException('Not implemented.');
+    }
 }
 
 /**
@@ -146,58 +154,61 @@ class Mock_Connectors_Test_Provider extends AbstractProvider {
  *
  * @since 7.0.0
  */
-trait WP_AI_Client_Mock_Provider_Trait {
+trait WP_AI_Client_Mock_Provider_Trait
+{
+    /**
+     * Registers the mock provider in the AI Client registry.
+     *
+     * Safe to call multiple times; skips registration if already done.
+     * Must be called from set_up_before_class() after parent::set_up_before_class().
+     */
+    private static function register_mock_connectors_provider(): void
+    {
+        $ai_registry = AiClient::defaultRegistry();
+        if (! $ai_registry->hasProvider('mock-connectors-test')) {
+            $ai_registry->registerProvider(Mock_Connectors_Test_Provider::class);
+        }
 
-	/**
-	 * Registers the mock provider in the AI Client registry.
-	 *
-	 * Safe to call multiple times; skips registration if already done.
-	 * Must be called from set_up_before_class() after parent::set_up_before_class().
-	 */
-	private static function register_mock_connectors_provider(): void {
-		$ai_registry = AiClient::defaultRegistry();
-		if ( ! $ai_registry->hasProvider( 'mock-connectors-test' ) ) {
-			$ai_registry->registerProvider( Mock_Connectors_Test_Provider::class );
-		}
+        // Also register in the WP connector registry if not already present.
+        $connector_registry = WP_Connector_Registry::get_instance();
+        if (null !== $connector_registry && ! $connector_registry->is_registered('mock-connectors-test')) {
+            $connector_registry->register(
+                'mock-connectors-test',
+                [
+                    'name'           => 'Mock Connectors Test',
+                    'description'    => '',
+                    'type'           => 'ai_provider',
+                    'authentication' => [
+                        'method'          => 'api_key',
+                        'credentials_url' => null,
+                        'setting_name'    => 'connectors_ai_mock_connectors_test_api_key',
+                    ],
+                ],
+            );
+        }
+    }
 
-		// Also register in the WP connector registry if not already present.
-		$connector_registry = WP_Connector_Registry::get_instance();
-		if ( null !== $connector_registry && ! $connector_registry->is_registered( 'mock-connectors-test' ) ) {
-			$connector_registry->register(
-				'mock-connectors-test',
-				array(
-					'name'           => 'Mock Connectors Test',
-					'description'    => '',
-					'type'           => 'ai_provider',
-					'authentication' => array(
-						'method'          => 'api_key',
-						'credentials_url' => null,
-						'setting_name'    => 'connectors_ai_mock_connectors_test_api_key',
-					),
-				)
-			);
-		}
-	}
+    /**
+     * Sets whether the mock provider reports as configured.
+     *
+     * @param bool $is_configured Whether the provider should be configured.
+     */
+    private static function set_mock_provider_configured(bool $is_configured): void
+    {
+        Mock_Connectors_Test_Provider_Availability::$is_configured = $is_configured;
+    }
 
-	/**
-	 * Sets whether the mock provider reports as configured.
-	 *
-	 * @param bool $is_configured Whether the provider should be configured.
-	 */
-	private static function set_mock_provider_configured( bool $is_configured ): void {
-		Mock_Connectors_Test_Provider_Availability::$is_configured = $is_configured;
-	}
-
-	/**
-	 * Unregisters the mock provider's connector setting.
-	 *
-	 * Reverses the side effect of _wp_register_default_connector_settings()
-	 * for the mock provider so that subsequent test classes start with a clean slate.
-	 * Must be called from tear_down_after_class() after running tests.
-	 */
-	private static function unregister_mock_connector_setting(): void {
-		$setting_name = 'connectors_ai_mock_connectors_test_api_key';
-		unregister_setting( 'connectors', $setting_name );
-		remove_filter( "option_{$setting_name}", '_wp_connectors_mask_api_key' );
-	}
+    /**
+     * Unregisters the mock provider's connector setting.
+     *
+     * Reverses the side effect of _wp_register_default_connector_settings()
+     * for the mock provider so that subsequent test classes start with a clean slate.
+     * Must be called from tear_down_after_class() after running tests.
+     */
+    private static function unregister_mock_connector_setting(): void
+    {
+        $setting_name = 'connectors_ai_mock_connectors_test_api_key';
+        unregister_setting('connectors', $setting_name);
+        remove_filter("option_{$setting_name}", '_wp_connectors_mask_api_key');
+    }
 }

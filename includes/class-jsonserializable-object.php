@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit Tests: JsonSerializable_Object
  *
@@ -7,16 +8,13 @@
  * @since 5.3.0
  */
 
-class JsonSerializable_Object implements JsonSerializable {
+class JsonSerializable_Object implements JsonSerializable
+{
+    public function __construct(private $data) {}
 
-	private $data;
-
-	public function __construct( $data ) {
-		$this->data = $data;
-	}
-
-	#[ReturnTypeWillChange]
-	public function jsonSerialize() {
-		return $this->data;
-	}
+    #[ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return $this->data;
+    }
 }

@@ -1,0 +1,896 @@
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependencyData.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyData.php
+new file mode 100644
+index 0000000..b263425
+--- /dev/null
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyData.php
+@@ -0,0 +1,129 @@
++<?php
++/**
++ * Tests for the WP_Plugin_Dependencies::get_dependency_data() method.
++ *
++ * @package WordPress
++ */
++
++require_once __DIR__ . '/base.php';
++
++/**
++ *
++ */
++ #[\PHPUnit\Framework\Attributes\Group('admin')]
++ #[\PHPUnit\Framework\Attributes\Group('plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_data')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_api_data')]
++class Tests_Admin_WPPluginDependencies_GetDependencyData extends WP_PluginDependencies_UnitTestCase {
++
++	/**
++	 * Tests that dependency data is retrieved.
++	 *
++	 *
++	 * @global string $pagenow The filename of the current screen.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_get_dependency_data() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		$expected = array( 'name' => 'Dependency 1' );
++		$this->set_property_value( 'dependency_api_data', array( 'dependency' => $expected ) );
++
++		$actual = self::$instance::get_dependency_data( 'dependency' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertSame( $expected, $actual );
++	}
++
++	/**
++	 * Tests that false is returned when no dependency data exists.
++	 *
++	 *
++	 * @global string $pagenow The filename of the current screen.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_return_false_when_no_dependency_data_exists() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		$this->set_property_value( 'dependency_api_data', array() );
++
++		$actual = self::$instance::get_dependency_data( 'dependency' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertFalse( $actual );
++	}
++
++	/**
++	 * Tests that a 'slug' key in the Plugins API response object is not assumed.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('60540')]
++	public function test_should_not_assume_a_slug_key_exists_in_the_response() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		add_filter(
++			'plugins_api',
++			static function ( $bypass, $action, $args ) {
++				if ( 'plugin_information' === $action && isset( $args->slug ) && 'dependency' === $args->slug ) {
++					$bypass = (object) array( 'name' => 'Dependency 1' );
++				}
++				return $bypass;
++			},
++			10,
++			3
++		);
++
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependent/dependent.php' => array(
++					'Name'            => 'Dependent',
++					'RequiresPlugins' => 'dependency',
++				),
++			)
++		);
++
++		self::$instance->initialize();
++
++		$actual = $this->get_property_value( 'dependency_api_data' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertSame(
++			array(
++				'dependency' => array(
++					'name'     => 'Dependency 1',
++					'external' => true,
++					'Name'     => 'Dependency 1',
++				),
++			),
++			$actual
++		);
++	}
++}
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php
+new file mode 100644
+index 0000000..f42f700
+--- /dev/null
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyFilepath.php
+@@ -0,0 +1,159 @@
++<?php
++/**
++ * Tests for the WP_Plugin_Dependencies::get_dependency_filepath() method.
++ *
++ * @package WordPress
++ */
++
++require_once __DIR__ . '/base.php';
++
++/**
++ *
++ */
++ #[\PHPUnit\Framework\Attributes\Group('admin')]
++ #[\PHPUnit\Framework\Attributes\Group('plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_filepath')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_filepaths')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_plugin_dirnames')]
++class Tests_Admin_WPPluginDependencies_GetDependencyFilepath extends WP_PluginDependencies_UnitTestCase {
++
++	/**
++	 * Tests that false is returned if Plugin Dependencies has not been initialized.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('60457')]
++	public function test_should_return_false_before_initialization() {
++		// Ensure Plugin Dependencies has not been initialized.
++		$this->assertFalse(
++			$this->get_property_value( 'initialized' ),
++			'Plugin Dependencies has been initialized.'
++		);
++
++		$this->assertSame(
++			self::$static_properties['dependency_slugs'],
++			$this->get_property_value( 'dependency_slugs' ),
++			'"dependency_slugs" was not set to its default value.'
++		);
++
++		$this->assertFalse(
++			self::$instance->get_dependency_filepath( 'dependency' ),
++			'false was not returned before initialization.'
++		);
++	}
++
++	/**
++	 * Tests that the expected dependency filepaths are retrieved for installed dependencies.
++	 *
++	 *
++	 *
++	 * @param string[]     $dependency_slug The dependency slug.
++	 * @param string[]     $plugins         An array of plugin paths.
++	 * @param string|false $expected       The expected result.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	 #[\PHPUnit\Framework\Attributes\DataProvider('data_get_dependency_filepath')]
++	public function test_should_return_filepaths_for_installed_dependencies( $dependency_slug, $plugins, $expected ) {
++		$this->set_property_value( 'plugins', $plugins );
++		$this->assertNull( $this->get_property_value( 'dependency_filepaths' ) );
++		self::$instance::initialize();
++
++		$this->assertSame(
++			$expected,
++			self::$instance::get_dependency_filepath( $dependency_slug ),
++			'The incorrect filepath was returned.'
++		);
++	}
++
++	/**
++	 * Data provider.
++	 *
++	 * @return array[]
++	 */
++	public function data_get_dependency_filepath() {
++		return array(
++			'no plugins'                      => array(
++				'dependency_slug' => 'dependency',
++				'plugins'         => array(),
++				'expected'        => false,
++			),
++			'a plugin that starts with slug/' => array(
++				'dependency_slug' => 'dependency',
++				'plugins'         => array(
++					'dependency-pro/dependency.php' => array( 'RequiresPlugins' => '' ),
++					'dependent/dependent.php'       => array( 'RequiresPlugins' => 'dependency' ),
++				),
++				'expected'        => false,
++			),
++			'a plugin that ends with slug/'   => array(
++				'dependency_slugs' => 'dependency',
++				'plugins'          => array(
++					'addon-for-dependency/dependency.php' => array( 'RequiresPlugins' => '' ),
++					'dependent/dependent.php'             => array( 'RequiresPlugins' => 'dependency' ),
++				),
++				'expected'         => false,
++			),
++			'a plugin that does not exist'    => array(
++				'dependency_slugs' => 'dependency2',
++				'plugins'          => array(
++					'dependency/dependency.php' => array( 'RequiresPlugins' => '' ),
++					'dependent/dependent.php'   => array( 'RequiresPlugins' => 'dependency2' ),
++				),
++				'expected'         => false,
++			),
++			'a plugin that exists'            => array(
++				'dependency_slugs' => 'dependency',
++				'plugins'          => array(
++					'dependency/dependency.php' => array( 'RequiresPlugins' => '' ),
++					'dependent/dependent.php'   => array( 'RequiresPlugins' => 'dependency' ),
++				),
++				'expected'         => 'dependency/dependency.php',
++			),
++		);
++	}
++
++	/**
++	 * Tests that an existing value for dependency filepaths is returned.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_return_existing_value_for_dependency_filepaths() {
++		$expected = 'dependency/dependency.php';
++
++		$this->set_property_value( 'dependency_filepaths', array( 'dependency' => $expected ) );
++
++		/*
++		 * If existing dependency filepaths are not returned,
++		 * they'll be built from this data.
++		 *
++		 * This data is explicitly set to ensure that no
++		 * test plugins ever interfere with this test.
++		 */
++		$this->set_property_value(
++			'dependency_slugs',
++			array( 'dependency', 'dependency2', 'dependency3' )
++		);
++
++		$this->set_property_value(
++			'plugins',
++			array(
++				// This is flipped as paths are stored in the keys.
++				'dependency/dependency.php'   => array(),
++				'dependency2/dependency2.php' => array(),
++				'dependency3/dependency3.php' => array(),
++			)
++		);
++
++		$this->assertSame( $expected, self::$instance::get_dependency_filepath( 'dependency' ) );
++	}
++
++	/**
++	 * Tests that an empty array is returned when
++	 * no plugin directory names are stored.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_return_empty_array_for_no_plugin_dirnames() {
++		$this->set_property_value( 'dependency_slugs', array() );
++		$this->assertFalse( self::$instance::get_dependency_filepath( 'dependency' ) );
++	}
++}
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependencyNames.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyNames.php
+new file mode 100644
+index 0000000..718a471
+--- /dev/null
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependencyNames.php
+@@ -0,0 +1,256 @@
++<?php
++/**
++ * Tests for the WP_Plugin_Dependencies::get_dependency_names() method.
++ *
++ * @package WordPress
++ */
++
++require_once __DIR__ . '/base.php';
++
++/**
++ *
++ */
++ #[\PHPUnit\Framework\Attributes\Group('admin')]
++ #[\PHPUnit\Framework\Attributes\Group('plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_names')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_api_data')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependencies')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependency_filepaths')]
++class Tests_Admin_WPPluginDependencies_GetDependencyNames extends WP_PluginDependencies_UnitTestCase {
++
++	/**
++	 * Mocks an API response.
++	 *
++	 * @param string $type The type of response. Accepts 'success' or 'failure'.
++	 */
++	private function mock_api_response( $type ) {
++		add_filter(
++			'plugins_api',
++			function ( $bypass, $action, $args ) use ( $type ) {
++				if ( 'plugin_information' === $action && isset( $args->slug ) && str_starts_with( $args->slug, 'dependency' ) ) {
++					if ( 'success' === $type ) {
++						return (object) array(
++							'slug' => $args->slug,
++							'name' => 'Dependency ' . str_replace( 'dependency', '', $args->slug ),
++						);
++					} elseif ( 'failure' === $type ) {
++						return new WP_Error( 'plugin_not_found', 'Plugin not found.' );
++					}
++				}
++
++				return $bypass;
++			},
++			10,
++			3
++		);
++	}
++
++	/**
++	 * Tests that dependency names are retrieved.
++	 *
++	 *
++	 * @global string $pagenow The filename of the current screen.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_get_dependency_names() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		$this->set_property_value(
++			'plugins',
++			array( 'dependent/dependent.php' => array( 'RequiresPlugins' => 'dependency, dependency2' ) )
++		);
++
++		$this->mock_api_response( 'success' );
++		self::$instance::initialize();
++
++		$this->set_property_value(
++			'dependency_filepaths',
++			array(
++				'dependency'  => 'dependency/dependency.php',
++				'dependency2' => 'dependency2/dependency2.php',
++			)
++		);
++
++		$this->set_property_value(
++			'dependency_api_data',
++			array(
++				'dependency'  => array(
++					'name' => 'Dependency 1',
++				),
++				'dependency2' => array(
++					'name' => 'Dependency 2',
++				),
++			)
++		);
++
++		$actual = self::$instance::get_dependency_names( 'dependent/dependent.php' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertSame(
++			array(
++				'dependency'  => 'Dependency 1',
++				'dependency2' => 'Dependency 2',
++			),
++			$actual
++		);
++	}
++
++	/**
++	 * Tests that dependency slugs are used if their name is not available.
++	 *
++	 *
++	 * @global string $pagenow The filename of the current screen.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_use_dependency_name_from_file() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependent/dependent.php'     => array( 'RequiresPlugins' => 'dependency, dependency2' ),
++				'dependency/dependency.php'   => array(
++					'Name'            => 'Dependency 1',
++					'RequiresPlugins' => '',
++				),
++				'dependency2/dependency2.php' => array(
++					'Name'            => 'Dependency 2',
++					'RequiresPlugins' => '',
++				),
++			)
++		);
++
++		$this->mock_api_response( 'failure' );
++		self::$instance::initialize();
++
++		$this->set_property_value(
++			'dependency_filepaths',
++			array(
++				'dependency'  => 'dependency/dependency.php',
++				'dependency2' => 'dependency2/dependency2.php',
++			)
++		);
++
++		// The plugins are not in the Plugins repository.
++		$this->set_property_value( 'dependency_api_data', array() );
++
++		$actual = self::$instance::get_dependency_names( 'dependent/dependent.php' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertSame(
++			array(
++				'dependency'  => 'Dependency 1',
++				'dependency2' => 'Dependency 2',
++			),
++			$actual
++		);
++	}
++
++	/**
++	 * Tests that dependency slugs are used if their name is not available.
++	 *
++	 *
++	 * @global string $pagenow The filename of the current screen.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_use_dependency_slugs() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		$this->set_property_value(
++			'plugins',
++			array( 'dependent/dependent.php' => array( 'RequiresPlugins' => 'dependency, dependency2' ) )
++		);
++
++		$this->mock_api_response( 'failure' );
++		self::$instance::initialize();
++
++		// The plugins are not in the Plugins repository.
++		$this->set_property_value( 'dependency_api_data', array() );
++
++		$actual = self::$instance::get_dependency_names( 'dependent/dependent.php' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertSame(
++			array(
++				'dependency'  => 'dependency',
++				'dependency2' => 'dependency2',
++			),
++			$actual
++		);
++	}
++
++	/**
++	 * Tests that `$dependency_api_data` is set when it's not already available.
++	 *
++	 *
++	 * @global string $pagenow The filename of the current screen.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_set_dependency_data_when_not_already_available() {
++		global $pagenow;
++
++		// Backup $pagenow.
++		$old_pagenow = $pagenow;
++
++		// Ensure is_admin() and screen checks pass.
++		$pagenow = 'plugins.php';
++		set_current_screen( 'plugins.php' );
++
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependent/dependent.php'   => array(
++					'Name'            => 'Dependent 1',
++					'RequiresPlugins' => 'dependency',
++				),
++				'dependency/dependency.php' => array(
++					'Name'            => 'Dependency 1',
++					'RequiresPlugins' => '',
++				),
++			)
++		);
++
++		$this->set_property_value( 'dependency_slugs', array( 'dependency' ) );
++
++		set_site_transient( 'wp_plugin_dependencies_plugin_data', array( 'dependency' => false ) );
++		set_site_transient( 'wp_plugin_dependencies_plugin_timeout_dependency', true, 12 * HOUR_IN_SECONDS );
++
++		$this->mock_api_response( 'success' );
++		self::$instance::get_dependency_names( 'dependent' );
++
++		// Restore $pagenow.
++		$pagenow = $old_pagenow;
++
++		$this->assertSame(
++			array( 'dependency' => array( 'Name' => 'Dependency 1' ) ),
++			$this->get_property_value( 'dependency_api_data' )
++		);
++	}
++}
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php
+new file mode 100644
+index 0000000..b8fecf7
+--- /dev/null
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependentFilepath.php
+@@ -0,0 +1,75 @@
++<?php
++/**
++ * Tests for the WP_Plugin_Dependencies::get_dependent_filepath() method.
++ *
++ * @package WordPress
++ */
++
++require_once __DIR__ . '/base.php';
++
++/**
++ *
++ */
++ #[\PHPUnit\Framework\Attributes\Group('admin')]
++ #[\PHPUnit\Framework\Attributes\Group('plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependent_filepath')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_plugin_dirnames')]
++class Tests_Admin_WPPluginDependencies_GetDependentFilepath extends WP_PluginDependencies_UnitTestCase {
++
++	/**
++	 * Tests that the expected dependent filepath is retrieved.
++	 *
++	 *
++	 *
++	 * @param string       $dependent_slug The dependent slug.
++	 * @param string[]     $plugins        An array of plugin data.
++	 * @param string|false $expected       The expected result.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	 #[\PHPUnit\Framework\Attributes\DataProvider('data_get_dependent_filepath')]
++	public function test_should_return_filepaths_for_installed_dependents( $dependent_slug, $plugins, $expected ) {
++		$this->set_property_value( 'plugins', $plugins );
++		self::$instance::initialize();
++
++		$this->assertSame(
++			$expected,
++			self::$instance::get_dependent_filepath( $dependent_slug ),
++			'The incorrect filepath was returned.'
++		);
++	}
++
++	/**
++	 * Data provider.
++	 *
++	 * @return array[]
++	 */
++	public function data_get_dependent_filepath() {
++		return array(
++			'a plugin that exists'            => array(
++				'dependent_slug' => 'dependent',
++				'plugins'        => array( 'dependent/dependent.php' => array( 'RequiresPlugins' => 'woocommerce' ) ),
++				'expected'       => 'dependent/dependent.php',
++			),
++			'no plugins'                      => array(
++				'dependent_slug' => 'dependent',
++				'plugins'        => array(),
++				'expected'       => false,
++			),
++			'a plugin that starts with slug/' => array(
++				'dependent_slug' => 'dependent',
++				'plugins'        => array( 'dependent-pro/dependent.php' => array( 'RequiresPlugins' => 'woocommerce' ) ),
++				'expected'       => false,
++			),
++			'a plugin that ends with slug/'   => array(
++				'dependent_slug' => 'dependent',
++				'plugins'        => array( 'not-dependent/not-dependent.php' => array( 'RequiresPlugins' => 'woocommerce' ) ),
++				'expected'       => false,
++			),
++			'a plugin that does not exist'    => array(
++				'dependent_slug' => 'dependent2',
++				'plugins'        => array( 'dependent/dependent.php' => array( 'RequiresPlugins' => 'woocommerce' ) ),
++				'expected'       => false,
++			),
++		);
++	}
++}
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/getDependentNames.php b/tests/phpunit/tests/admin/plugin-dependencies/getDependentNames.php
+new file mode 100644
+index 0000000..4836352
+--- /dev/null
++++ b/tests/phpunit/tests/admin/plugin-dependencies/getDependentNames.php
+@@ -0,0 +1,76 @@
++<?php
++/**
++ * Tests for the WP_Plugin_Dependencies::get_dependent_names() method.
++ *
++ * @package WordPress
++ */
++
++require_once __DIR__ . '/base.php';
++
++/**
++ *
++ */
++ #[\PHPUnit\Framework\Attributes\Group('admin')]
++ #[\PHPUnit\Framework\Attributes\Group('plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependent_names')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'convert_to_slug')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_dependents')]
++class Tests_Admin_WPPluginDependencies_GetDependentNames extends WP_PluginDependencies_UnitTestCase {
++
++	/**
++	 * Tests that dependent names are retrieved.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_get_dependent_names() {
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependent/dependent.php'   => array(
++					'Name'            => 'Dependent 1',
++					'RequiresPlugins' => 'dependency',
++				),
++				'dependent2/dependent2.php' => array(
++					'Name'            => 'Dependent 2',
++					'RequiresPlugins' => 'dependency',
++				),
++			)
++		);
++
++		self::$instance::initialize();
++
++		$this->assertSame(
++			array( 'Dependent 1', 'Dependent 2' ),
++			self::$instance::get_dependent_names( 'dependency/dependency.php' )
++		);
++	}
++
++	/**
++	 * Tests that dependent names are sorted.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_sort_dependent_names() {
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependent2/dependent2.php' => array(
++					'Name'            => 'Dependent 2',
++					'RequiresPlugins' => 'dependency',
++				),
++				'dependent/dependent.php'   => array(
++					'Name'            => 'Dependent 1',
++					'RequiresPlugins' => 'dependency',
++				),
++			)
++		);
++
++		self::$instance::initialize();
++
++		$this->assertSame(
++			array( 'Dependent 1', 'Dependent 2' ),
++			self::$instance::get_dependent_names( 'dependency/dependency.php' )
++		);
++	}
++}
+diff --git a/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php b/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php
+new file mode 100644
+index 0000000..f883249
+--- /dev/null
++++ b/tests/phpunit/tests/admin/plugin-dependencies/hasCircularDependency.php
+@@ -0,0 +1,165 @@
++<?php
++/**
++ * Tests for the WP_Plugin_Dependencies::has_circular_dependency() method.
++ *
++ * @package WordPress
++ */
++
++require_once __DIR__ . '/base.php';
++
++/**
++ *
++ */
++ #[\PHPUnit\Framework\Attributes\Group('admin')]
++ #[\PHPUnit\Framework\Attributes\Group('plugins')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'has_circular_dependency')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'get_circular_dependencies')]
++ #[\PHPUnit\Framework\Attributes\CoversMethod(WP_Plugin_Dependencies::class, 'check_for_circular_dependencies')]
++class Tests_Admin_WPPluginDependencies_HasCircularDependency extends WP_PluginDependencies_UnitTestCase {
++
++	/**
++	 * Tests that false is returned if Plugin Dependencies has not been initialized.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('60457')]
++	public function test_should_return_false_before_initialization() {
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependent/dependent.php'   => array(
++					'Name'            => 'Dependent',
++					'RequiresPlugins' => 'dependency',
++				),
++				'dependency/dependency.php' => array(
++					'Name'            => 'Dependency',
++					'RequiresPlugins' => 'dependent',
++				),
++			)
++		);
++
++		// Ensure Plugin Dependencies has not been initialized.
++		$this->assertFalse(
++			$this->get_property_value( 'initialized' ),
++			'Plugin Dependencies has been initialized.'
++		);
++
++		$this->assertSame(
++			self::$static_properties['circular_dependencies_slugs'],
++			$this->get_property_value( 'circular_dependencies_slugs' ),
++			'"circular_dependencies_slugs" was not set to its default value.'
++		);
++
++		$this->assertFalse(
++			self::$instance->has_circular_dependency( 'dependency' ),
++			'false was not returned before initialization.'
++		);
++	}
++
++	/**
++	 * Tests that a plugin with a circular dependency will return true.
++	 *
++	 *
++	 *
++	 * @param string  $plugin_to_check The plugin file of the plugin to check.
++	 * @param array[] $plugins         An array of plugins.
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	 #[\PHPUnit\Framework\Attributes\DataProvider('data_circular_dependencies')]
++	public function test_should_return_true_when_a_plugin_has_circular_dependency( $plugin_to_check, $plugins ) {
++		$this->set_property_value( 'plugins', $plugins );
++		self::$instance::initialize();
++
++		$this->assertTrue( self::$instance::has_circular_dependency( $plugin_to_check ) );
++	}
++
++	/**
++	 * Data provider.
++	 *
++	 * @return array[]
++	 */
++	public function data_circular_dependencies() {
++		return array(
++			'a plugin that depends on itself' => array(
++				'plugin_to_check' => 'dependency/dependency.php',
++				'plugins'         => array(
++					'dependency/dependency.php' => array(
++						'Name'            => 'Dependency 1',
++						'RequiresPlugins' => 'dependency',
++					),
++				),
++			),
++			'two plugins'                     => array(
++				'plugin_to_check' => 'dependency/dependency.php',
++				'plugins'         => array(
++					'dependency/dependency.php'   => array(
++						'Name'            => 'Dependency 1',
++						'RequiresPlugins' => 'dependency2',
++					),
++					'dependency2/dependency2.php' => array(
++						'Name'            => 'Dependency 2',
++						'RequiresPlugins' => 'dependency',
++					),
++				),
++			),
++			'three plugins'                   => array(
++				'plugin_to_check' => 'dependency/dependency.php',
++				'plugins'         => array(
++					'dependency/dependency.php'   => array(
++						'Name'            => 'Dependency 1',
++						'RequiresPlugins' => 'dependency2',
++					),
++					'dependency2/dependency2.php' => array(
++						'Name'            => 'Dependency 2',
++						'RequiresPlugins' => 'dependency3',
++					),
++					'dependency3/dependency3.php' => array(
++						'Name'            => 'Dependency 3',
++						'RequiresPlugins' => 'dependency',
++					),
++				),
++			),
++			'four plugins'                    => array(
++				'plugin_to_check' => 'dependency/dependency.php',
++				'plugins'         => array(
++					'dependency/dependency.php'   => array(
++						'Name'            => 'Dependency 1',
++						'RequiresPlugins' => 'dependency4',
++					),
++					'dependency2/dependency2.php' => array(
++						'Name'            => 'Dependency 2',
++						'RequiresPlugins' => 'dependency3',
++					),
++					'dependency3/dependency3.php' => array(
++						'Name'            => 'Dependency 3',
++						'RequiresPlugins' => 'dependency',
++					),
++					'dependency4/dependency4.php' => array(
++						'Name'            => 'Dependency 4',
++						'RequiresPlugins' => 'dependency2',
++					),
++				),
++			),
++		);
++	}
++
++	/**
++	 * Tests that a plugin with no circular dependencies will return false.
++	 *
++	 */
++	 #[\PHPUnit\Framework\Attributes\Ticket('22316')]
++	public function test_should_return_false_when_a_plugin_has_no_circular_dependency() {
++		$this->set_property_value(
++			'plugins',
++			array(
++				'dependency/dependency.php' => array(
++					'Name'            => 'Dependency 1',
++					'RequiresPlugins' => 'dependency2',
++				),
++			)
++		);
++
++		self::$instance::initialize();
++
++		$this->assertFalse( self::$instance::has_circular_dependency( 'dependent/dependent.php' ) );
++	}
++}

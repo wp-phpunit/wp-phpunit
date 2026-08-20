@@ -1,0 +1,43 @@
+diff --git a/tests/phpunit/multisite.xml b/tests/phpunit/multisite.xml
+index 1fd45f2111..cbe43c99ab 100644
+--- a/tests/phpunit/multisite.xml
++++ b/tests/phpunit/multisite.xml
+@@ -1,17 +1,14 @@
+ <phpunit
+ 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-		xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.2/phpunit.xsd"
+-		bootstrap="includes/bootstrap.php"
++		xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.3/phpunit.xsd"
++		bootstrap="includes/bootstrap-phpunit13.php"
+ 		backupGlobals="false"
+ 		colors="true"
+ 		beStrictAboutTestsThatDoNotTestAnything="true"
+ 		beStrictAboutOutputDuringTests="true"
+ 		failOnRisky="true"
+-		convertErrorsToExceptions="true"
+-		convertWarningsToExceptions="true"
+-		convertNoticesToExceptions="true"
+-		convertDeprecationsToExceptions="true"
++		cacheDirectory=".phpunit.cache"
+ 		>
+ 	<php>
+ 		<const name="WP_TESTS_MULTISITE" value="1" />
+ 		<const name="WP_RUN_CORE_TESTS" value="1" />
+@@ -20,7 +17,7 @@
+ 		<!-- Default test suite to run all tests. -->
+ 		<testsuite name="default">
+ 			<directory suffix=".php">tests</directory>
+-			<exclude>tests/rest-api/rest-autosaves-controller.php</exclude>
++			<exclude>tests/rest-api/WP_Test_REST_Autosaves_Controller.php</exclude>
+       <exclude>tests/admin/plugin-dependencies/base.php</exclude>
+       <exclude>tests/block-templates/base.php</exclude>
+       <exclude>tests/filesystem/base.php</exclude>
+@@ -38,7 +35,7 @@
+ 		</testsuite>
+ 		<!-- Sets the DOING_AUTOSAVE constant, so needs to be run last. -->
+ 		<testsuite name="restapi-autosave">
+-			<file>tests/rest-api/rest-autosaves-controller.php</file>
++			<file>tests/rest-api/WP_Test_REST_Autosaves_Controller.php</file>
+ 		</testsuite>
+ 	</testsuites>
+ 	<groups>

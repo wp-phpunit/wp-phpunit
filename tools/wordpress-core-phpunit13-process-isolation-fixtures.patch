@@ -1,0 +1,22 @@
+diff --git a/tests/phpunit/tests/admin/exportWp.php b/tests/phpunit/tests/admin/exportWp.php
+--- a/tests/phpunit/tests/admin/exportWp.php
++++ b/tests/phpunit/tests/admin/exportWp.php
+@@ -41,8 +41,17 @@ class Tests_Admin_ExportWp extends WP_UnitTestCase {
+ 	);
+ 
+ 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+ 		require_once ABSPATH . 'wp-admin/includes/export.php';
+-		$file = DIR_TESTDATA . '/images/test-image.jpg';
++	}
++
++	public function set_up() {
++		parent::set_up();
++		$this->set_up_export_fixtures();
++	}
++
++	private function set_up_export_fixtures() {
++		$factory = self::factory();
++		$file    = DIR_TESTDATA . '/images/test-image.jpg';
+ 
+ 		$dataset = array(
+ 			'post 1' => array(

@@ -1,0 +1,81 @@
+diff --git a/tests/phpunit/tests/post/attachments.php b/tests/phpunit/tests/post/attachments.php
+index cf16f16598..8be3803ce9 100644
+--- a/tests/phpunit/tests/post/attachments.php
++++ b/tests/phpunit/tests/post/attachments.php
+@@ -160,6 +160,8 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
+ 		$this->assertSame( '2007-06-17DSC_4173.jpg', wp_basename( $downsize[0] ) );
+ 		$this->assertSame( 680, $downsize[1] );
+ 		$this->assertSame( 1024, $downsize[2] );
++
++		wp_delete_attachment( $id, true );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/upload.php b/tests/phpunit/tests/upload.php
+index fa37f3bd71..40cad050ae 100644
+--- a/tests/phpunit/tests/upload.php
++++ b/tests/phpunit/tests/upload.php
+@@ -21,11 +21,16 @@ class Tests_Upload extends WP_UnitTestCase {
+ 
+ 	public function test_upload_dir_default() {
+ 		// wp_upload_dir() with default parameters.
+-		$info   = wp_upload_dir();
+-		$subdir = date_format( date_create( 'now' ), '/Y/m' );
++		$info          = wp_upload_dir();
++		$subdir        = date_format( date_create( 'now' ), '/Y/m' );
++		$expected_path = ABSPATH . 'wp-content/uploads';
++		$test_token    = getenv( 'TEST_TOKEN' );
++		if ( false !== $test_token && '' !== $test_token ) {
++			$expected_path .= '/.paratest-' . preg_replace( '/[^0-9A-Za-z_]/', '_', $test_token );
++		}
+ 
+ 		$this->assertSame( get_option( 'siteurl' ) . '/wp-content/uploads' . $subdir, $info['url'] );
+-		$this->assertSame( ABSPATH . 'wp-content/uploads' . $subdir, $info['path'] );
++		$this->assertSame( $expected_path . $subdir, $info['path'] );
+ 		$this->assertSame( $subdir, $info['subdir'] );
+ 		$this->assertFalse( $info['error'] );
+ 	}
++
+diff --git a/tests/phpunit/tests/ajax/wpAjaxDeletePlugin.php b/tests/phpunit/tests/ajax/wpAjaxDeletePlugin.php
+--- a/tests/phpunit/tests/ajax/wpAjaxDeletePlugin.php
++++ b/tests/phpunit/tests/ajax/wpAjaxDeletePlugin.php
+@@ -133,6 +133,11 @@ class Tests_Ajax_wpAjaxDeletePlugin extends WP_Ajax_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Group('ms-excluded')]
+ 	public function test_delete_plugin() {
++		$plugin_file = WP_PLUGIN_DIR . '/foo.php';
++		if ( ! file_exists( $plugin_file ) ) {
++			file_put_contents( $plugin_file, "<?php\n" );
++		}
++
+ 		$this->_setRole( 'administrator' );
+ 
+ 		$_POST['_ajax_nonce'] = wp_create_nonce( 'updates' );
++
+diff --git a/tests/phpunit/tests/multisite/msFilesRewriting.php b/tests/phpunit/tests/multisite/msFilesRewriting.php
+--- a/tests/phpunit/tests/multisite/msFilesRewriting.php
++++ b/tests/phpunit/tests/multisite/msFilesRewriting.php
+@@ -23,12 +23,13 @@ class Tests_Multisite_msFilesRewriting extends WP_UnitTestCase {
+ 
+ 		$site = get_current_site();
+ 		$date = date_format( date_create( 'now' ), 'Y/m' );
++		$worker = '.paratest-' . preg_replace( '/[^0-9A-Za-z_]/', '_', getenv( 'TEST_TOKEN' ) );
+ 
+ 		$user_id  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+ 		$blog_id2 = self::factory()->blog->create( array( 'user_id' => $user_id ) );
+ 		$info     = wp_upload_dir();
+ 		$this->assertSame( 'http://' . $site->domain . '/wp-content/uploads/' . $date, $info['url'] );
+-		$this->assertSame( ABSPATH . 'wp-content/uploads/' . $date, $info['path'] );
++		$this->assertSame( ABSPATH . 'wp-content/uploads/' . $worker . '/' . $date, $info['path'] );
+ 		$this->assertSame( '/' . $date, $info['subdir'] );
+ 		$this->assertFalse( $info['error'] );
+ 
+@@ -36,7 +37,7 @@ class Tests_Multisite_msFilesRewriting extends WP_UnitTestCase {
+ 		$info2 = wp_upload_dir();
+ 		$this->assertNotEquals( $info, $info2 );
+ 		$this->assertSame( get_option( 'siteurl' ) . '/wp-content/blogs.dir/' . get_current_blog_id() . '/files/' . $date, $info2['url'] );
+-		$this->assertSame( ABSPATH . 'wp-content/blogs.dir/' . get_current_blog_id() . '/files/' . $date, $info2['path'] );
++		$this->assertSame( ABSPATH . 'wp-content/blogs.dir/' . get_current_blog_id() . '/files/' . $worker . '/' . $date, $info2['path'] );
+ 		$this->assertSame( '/' . $date, $info2['subdir'] );
+ 		$this->assertFalse( $info2['error'] );
+ 		restore_current_blog();

@@ -1,0 +1,117 @@
+diff --git a/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php b/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
+--- a/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
++++ b/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
+@@ -1,4 +1,7 @@
+ <?php
++
++require_once __DIR__ . '/wpRestFontFamiliesController.php';
++
+ /**
+  * Unit tests covering WP_REST_Font_Faces_Controller_Test functionality.
+  *
+diff --git a/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php b/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php
+--- a/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php
++++ b/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php
+@@ -1,4 +1,7 @@
+ <?php
++
++require_once __DIR__ . '/wpRestFontFacesController.php';
++
+ /**
+  * Unit tests covering WP_REST_Font_Families_Controller_Test functionality.
+  *
+diff --git a/tests/phpunit/tests/functions/wpTriggerError.php b/tests/phpunit/tests/functions/wpTriggerError.php
+--- a/tests/phpunit/tests/functions/wpTriggerError.php
++++ b/tests/phpunit/tests/functions/wpTriggerError.php
+@@ -65,9 +65,12 @@ class Tests_Functions_WpTriggerError extends WP_UnitTestCase {
+ 	#[\PHPUnit\Framework\Attributes\Ticket('57686')]
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_should_trigger_error')]
+ 	public function test_should_trigger_deprecation( $function_name, $message, $expected_message ) {
+-		$this->expectUserDeprecationMessage( $expected_message );
+-
+-		wp_trigger_error( $function_name, $message, E_USER_DEPRECATED );
++		$this->assertExpectedUserDeprecation(
++			$expected_message,
++			static function () use ( $function_name, $message ) {
++				wp_trigger_error( $function_name, $message, E_USER_DEPRECATED );
++			}
++		);
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/image/Tests_WP_Site_Icon.php b/tests/phpunit/tests/image/Tests_WP_Site_Icon.php
+--- a/tests/phpunit/tests/image/Tests_WP_Site_Icon.php
++++ b/tests/phpunit/tests/image/Tests_WP_Site_Icon.php
+@@ -99,6 +99,8 @@ class Tests_WP_Site_Icon extends WP_UnitTestCase {
+ 	}
+ 
+ 	public function test_insert_cropped_attachment() {
++		$this->expectWarning();
++
+ 		$attachment_id = $this->insert_attachment();
+ 		$parent_url    = get_post( $attachment_id )->guid;
+ 		$cropped       = str_replace( wp_basename( $parent_url ), 'cropped-test-image.jpg', $parent_url );
+diff --git a/tests/phpunit/tests/image/header.php b/tests/phpunit/tests/image/header.php
+--- a/tests/phpunit/tests/image/header.php
++++ b/tests/phpunit/tests/image/header.php
+@@ -109,6 +109,8 @@ class Tests_Image_Header extends WP_UnitTestCase {
+ 	}
+ 
+ 	public function test_insert_cropped_attachment() {
++		$this->expectWarning();
++
+ 		$id = wp_insert_attachment(
+ 			array(
+ 				'post_status' => 'publish',
+@@ -131,6 +133,8 @@ class Tests_Image_Header extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('21819')]
+ 	public function test_check_get_previous_crop() {
++		$this->expectWarning();
++
+ 		$id = wp_insert_attachment(
+ 			array(
+ 				'post_status' => 'publish',
+diff --git a/tests/phpunit/tests/privacy/wpPrivacyGeneratePersonalDataExportFile.php b/tests/phpunit/tests/privacy/wpPrivacyGeneratePersonalDataExportFile.php
+--- a/tests/phpunit/tests/privacy/wpPrivacyGeneratePersonalDataExportFile.php
++++ b/tests/phpunit/tests/privacy/wpPrivacyGeneratePersonalDataExportFile.php
+@@ -131,18 +131,16 @@ class Tests_Privacy_wpPrivacyGeneratePersonalDataExportFile extends WP_UnitTestC
+ 
+ 		chmod( self::$exports_dir, 0755 );
+ 
+-		$files = list_files( self::$exports_dir );
+-
+-		// Delete files first, then delete subdirectories.
+-		foreach ( $files as $file ) {
+-			if ( is_file( $file ) ) {
+-				wp_delete_file( $file );
+-			}
+-		}
++		$iterator = new RecursiveIteratorIterator(
++			new RecursiveDirectoryIterator( self::$exports_dir, FilesystemIterator::SKIP_DOTS ),
++			RecursiveIteratorIterator::CHILD_FIRST
++		);
+ 
+-		foreach ( $files as $file ) {
+-			if ( is_dir( $file ) ) {
+-				rmdir( $file );
++		foreach ( $iterator as $item ) {
++			if ( $item->isDir() ) {
++				rmdir( $item->getPathname() );
++			} else {
++				wp_delete_file( $item->getPathname() );
+ 			}
+ 		}
+ 
+diff --git a/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php b/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
+--- a/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
++++ b/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
+@@ -459,7 +462,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
+ 			'The font_face_settings data should match the expected data.'
+ 		);
+ 
+-		$expected_file_path = WP_CONTENT_DIR . '/uploads/fonts/subdir/' . reset( $files )['name'];
++		$expected_file_path = wp_get_upload_dir()['basedir'] . '/fonts/subdir/' . reset( $files )['name'];
+ 		$expected_post_meta = 'subdir/' . reset( $files )['name'];
+ 		$this->assertFileExists( $expected_file_path, 'The font file should exist in the expected subdirectory.' );
+ 		$this->assertSame( $expected_post_meta, get_post_meta( $data['id'], '_wp_font_face_file', true ), 'The post meta should match the expected subdirectory.' );

@@ -1,0 +1,12 @@
+diff --git a/tests/phpunit/tests/multisite/wpMsUsersListTable.php b/tests/phpunit/tests/multisite/wpMsUsersListTable.php
+--- a/tests/phpunit/tests/multisite/wpMsUsersListTable.php
++++ b/tests/phpunit/tests/multisite/wpMsUsersListTable.php
+@@ -99,7 +99,7 @@ class Tests_Multisite_wpMsUsersListTable extends WP_UnitTestCase {
+ 
+ 		$expected = array(
+ 			'all'   => '<a href="http://' . WP_TESTS_DOMAIN . '/wp-admin/network/users.php" class="current" aria-current="page">All <span class="count">(' . $all . ')</span></a>',
+-			'super' => '<a href="http://' . WP_TESTS_DOMAIN . '/wp-admin/network/users.php?role=super">Super Admin <span class="count">(' . $super . ')</span></a>',
++			'super' => '<a href="http://' . WP_TESTS_DOMAIN . '/wp-admin/network/users.php?role=super">' . _n( 'Super Admin', 'Super Admins', $super ) . ' <span class="count">(' . $super . ')</span></a>',
+ 		);
+ 
+ 		$this->assertSame( $expected, $this->table->get_views() );

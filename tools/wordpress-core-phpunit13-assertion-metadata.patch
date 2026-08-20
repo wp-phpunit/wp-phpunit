@@ -1,0 +1,677 @@
+diff --git a/tests/phpunit/tests/fonts/font-library/wpRestFontCollectionsController.php b/tests/phpunit/tests/fonts/font-library/wpRestFontCollectionsController.php
+index 31fc661aa6..6fdc921e08 100644
+--- a/tests/phpunit/tests/fonts/font-library/wpRestFontCollectionsController.php
++++ b/tests/phpunit/tests/fonts/font-library/wpRestFontCollectionsController.php
+@@ -257,36 +257,36 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not use test_create_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not use test_update_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not use test_delete_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not use test_prepare_item().
+ 	}
+diff --git a/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php b/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
+index 9c785c3fce..ee3d4be7e0 100644
+--- a/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
++++ b/tests/phpunit/tests/fonts/font-library/wpRestFontFacesController.php
+@@ -152,8 +152,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// See test_get_context_param().
+ 	}
+diff --git a/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php b/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php
+index a7dd98ee22..5bc3045e23 100644
+--- a/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php
++++ b/tests/phpunit/tests/fonts/font-library/wpRestFontFamiliesController.php
+@@ -168,8 +168,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// See test_get_context_param().
+ 	}
+diff --git a/tests/phpunit/tests/icons/wpRestIconsController.php b/tests/phpunit/tests/icons/wpRestIconsController.php
+index fe7ec3c2e6..6790a6da97 100644
+--- a/tests/phpunit/tests/icons/wpRestIconsController.php
++++ b/tests/phpunit/tests/icons/wpRestIconsController.php
+@@ -45,8 +45,8 @@ class Tests_REST_WpRestIconsController extends WP_Test_REST_Controller_Testcase
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 	}
+ 
+@@ -105,15 +105,15 @@ class Tests_REST_WpRestIconsController extends WP_Test_REST_Controller_Testcase
+ 	 *
+ 	 * @covers ::get_item
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item() {
+ 		// see methods test_get_item_*
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_items() {
+ 		// see methods test_get_items_*
+ 	}
+@@ -144,8 +144,8 @@ class Tests_REST_WpRestIconsController extends WP_Test_REST_Controller_Testcase
+ 	 *
+ 	 * @covers ::get_item_schema
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item_schema() {
+ 	}
+ 
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Autosaves_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Autosaves_Controller.php
+index 4261f02c52..bbd1bf0c74 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Autosaves_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Autosaves_Controller.php
+@@ -384,8 +384,8 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Pages_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Pages_Controller.php
+index c7a75b2624..54c7a9fe0e 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Pages_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Pages_Controller.php
+@@ -410,8 +410,8 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item() {
+ 		// Controller does not implement get_item().
+ 	}
+@@ -424,8 +424,8 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+@@ -492,8 +492,8 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+@@ -518,8 +518,8 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Settings_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Settings_Controller.php
+index c890aea847..ce6a106761 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Settings_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Settings_Controller.php
+@@ -75,8 +75,8 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+@@ -386,8 +386,8 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+@@ -670,15 +670,15 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item_schema() {
+ 		// Controller does not implement get_item_schema().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Sidebars_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Sidebars_Controller.php
+index 1342cd5056..795cbe4b83 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Sidebars_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Sidebars_Controller.php
+@@ -707,8 +707,8 @@ class WP_Test_REST_Sidebars_Controller extends WP_Test_REST_Controller_Testcase
+ 	/**
+ 	 * The create_item() method does not exist for sidebar.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+@@ -1094,8 +1094,8 @@ class WP_Test_REST_Sidebars_Controller extends WP_Test_REST_Controller_Testcase
+ 	/**
+ 	 * The delete_item() method does not exist for sidebar.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+@@ -1103,8 +1103,8 @@ class WP_Test_REST_Sidebars_Controller extends WP_Test_REST_Controller_Testcase
+ 	/**
+ 	 * The prepare_item() method does not exist for sidebar.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Themes_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Themes_Controller.php
+index dadf606912..c7705153ed 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Themes_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Themes_Controller.php
+@@ -1388,8 +1388,8 @@ class WP_Test_REST_Themes_Controller extends WP_Test_REST_Controller_Testcase {
+ 	/**
+ 	 * The create_item() method does not exist for themes.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+@@ -1397,8 +1397,8 @@ class WP_Test_REST_Themes_Controller extends WP_Test_REST_Controller_Testcase {
+ 	/**
+ 	 * The update_item() method does not exist for themes.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+@@ -1595,8 +1595,8 @@ class WP_Test_REST_Themes_Controller extends WP_Test_REST_Controller_Testcase {
+ 	/**
+ 	 * The delete_item() method does not exist for themes.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+@@ -1604,8 +1604,8 @@ class WP_Test_REST_Themes_Controller extends WP_Test_REST_Controller_Testcase {
+ 	/**
+ 	 * Context is not supported for themes.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php
+index 1ed005e259..48cacc587e 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Widget_Types_Controller.php
+@@ -59,6 +59,18 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
+ 		self::delete_user( self::$subscriber_id );
+ 	}
+ 
++	public function set_up(): void {
++		parent::set_up();
++
++		global $wp_widget_factory;
++		wp_widgets_init();
++		foreach ( array( 'WP_Widget_Search', 'WP_Widget_Text' ) as $widget_class ) {
++			if ( ! isset( $wp_widget_factory->widgets[ $widget_class ] ) ) {
++				register_widget( $widget_class );
++			}
++		}
++	}
++
+ 	private function setup_widget( $id_base, $number, $settings ) {
+ 		global $wp_widget_factory;
+ 
+@@ -658,8 +670,8 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
+ 	/**
+ 	 * The create_item() method does not exist for widget types.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+@@ -667,8 +679,8 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
+ 	/**
+ 	 * The update_item() method does not exist for widget types.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+@@ -676,8 +688,8 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
+ 	/**
+ 	 * The delete_item() method does not exist for widget types.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Widgets_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Widgets_Controller.php
+index a6b89a870c..97f10528ca 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Widgets_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Widgets_Controller.php
+@@ -212,8 +212,8 @@ class WP_Test_REST_Widgets_Controller extends WP_Test_REST_Controller_Testcase {
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+@@ -1707,8 +1707,8 @@ class WP_Test_REST_Widgets_Controller extends WP_Test_REST_Controller_Testcase {
+ 	/**
+ 	 * The prepare_item() method does not exist for sidebar.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/wpRestBlockPatternCategoriesController.php b/tests/phpunit/tests/rest-api/wpRestBlockPatternCategoriesController.php
+index 7ac7ce5935..c4fbd3ee63 100644
+--- a/tests/phpunit/tests/rest-api/wpRestBlockPatternCategoriesController.php
++++ b/tests/phpunit/tests/rest-api/wpRestBlockPatternCategoriesController.php
+@@ -187,50 +187,50 @@ class Tests_REST_WpRestBlockPatternCategoriesController extends WP_Test_REST_Con
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item() {
+ 		// Controller does not implement get_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item_schema() {
+ 		// Controller does not implement get_item_schema().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/wpRestBlockPatternsController.php b/tests/phpunit/tests/rest-api/wpRestBlockPatternsController.php
+index e04cd4acfb..3b2fdd24df 100644
+--- a/tests/phpunit/tests/rest-api/wpRestBlockPatternsController.php
++++ b/tests/phpunit/tests/rest-api/wpRestBlockPatternsController.php
+@@ -240,50 +240,50 @@ class Tests_REST_WpRestBlockPatternsController extends WP_Test_REST_Controller_T
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item() {
+ 		// Controller does not implement get_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item_schema() {
+ 		// Controller does not implement get_item_schema().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/wpRestEditSiteExportController.php b/tests/phpunit/tests/rest-api/wpRestEditSiteExportController.php
+index 05cc5413e3..7ce8af89d3 100644
+--- a/tests/phpunit/tests/rest-api/wpRestEditSiteExportController.php
++++ b/tests/phpunit/tests/rest-api/wpRestEditSiteExportController.php
+@@ -94,57 +94,57 @@ class Tests_REST_WpRestEditSiteExportController extends WP_Test_REST_Controller_
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item() {
+ 		// Controller does not implement get_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_items() {
+ 		// Controller does not implement get_items().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item_schema() {
+ 		// Controller does not implement get_item_schema().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/wpRestMenuLocationsController.php b/tests/phpunit/tests/rest-api/wpRestMenuLocationsController.php
+index dc6971fa1b..93ed0ce91d 100644
+--- a/tests/phpunit/tests/rest-api/wpRestMenuLocationsController.php
++++ b/tests/phpunit/tests/rest-api/wpRestMenuLocationsController.php
+@@ -178,8 +178,8 @@ class Tests_REST_WpRestMenuLocationsController extends WP_Test_REST_Controller_T
+ 	/**
+ 	 * The create_item() method does not exist for menu locations.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+@@ -187,8 +187,8 @@ class Tests_REST_WpRestMenuLocationsController extends WP_Test_REST_Controller_T
+ 	/**
+ 	 * The update_item() method does not exist for menu locations.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+@@ -196,8 +196,8 @@ class Tests_REST_WpRestMenuLocationsController extends WP_Test_REST_Controller_T
+ 	/**
+ 	 * The delete_item() method does not exist for menu locations.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+@@ -205,8 +205,8 @@ class Tests_REST_WpRestMenuLocationsController extends WP_Test_REST_Controller_T
+ 	/**
+ 	 * The prepare_item() method does not exist for menu locations.
+ 	 *
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/wpRestTemplatesController.php b/tests/phpunit/tests/rest-api/wpRestTemplatesController.php
+index 0d220ec4f4..ecb5047cf4 100644
+--- a/tests/phpunit/tests/rest-api/wpRestTemplatesController.php
++++ b/tests/phpunit/tests/rest-api/wpRestTemplatesController.php
+@@ -939,8 +939,8 @@ class Tests_REST_WpRestTemplatesController extends WP_Test_REST_Controller_Testc
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}
+diff --git a/tests/phpunit/tests/rest-api/wpRestUrlDetailsController.php b/tests/phpunit/tests/rest-api/wpRestUrlDetailsController.php
+index 17f52387d0..945e321d7e 100644
+--- a/tests/phpunit/tests/rest-api/wpRestUrlDetailsController.php
++++ b/tests/phpunit/tests/rest-api/wpRestUrlDetailsController.php
+@@ -1052,43 +1052,43 @@ class Tests_REST_WpRestUrlDetailsController extends WP_Test_REST_Controller_Test
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_context_param() {
+ 		// Controller does not use get_context_param().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_get_item() {
+ 		// Controller does not implement get_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_create_item() {
+ 		// Controller does not implement create_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_update_item() {
+ 		// Controller does not implement update_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_delete_item() {
+ 		// Controller does not implement delete_item().
+ 	}
+ 
+ 	/**
+-	 * @doesNotPerformAssertions
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+ 	public function test_prepare_item() {
+ 		// Controller does not implement prepare_item().
+ 	}

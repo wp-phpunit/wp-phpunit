@@ -1,0 +1,109 @@
+diff --git a/tests/phpunit/tests/blocks/render.php b/tests/phpunit/tests/blocks/render.php
+--- a/tests/phpunit/tests/blocks/render.php
++++ b/tests/phpunit/tests/blocks/render.php
+@@ -210,6 +210,7 @@ class Tests_Blocks_Render extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\DataProvider('data_do_block_test_filenames')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('45109')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_do_block_output( $html_filename, $server_html_filename ) {
+ 		$html_path        = self::$fixtures_dir . '/' . $html_filename;
+ 		$server_html_path = self::$fixtures_dir . '/' . $server_html_filename;
+diff --git a/tests/phpunit/tests/fonts/font-library/Tests_Fonts_WpFontDir.php b/tests/phpunit/tests/fonts/font-library/Tests_Fonts_WpFontDir.php
+--- a/tests/phpunit/tests/fonts/font-library/Tests_Fonts_WpFontDir.php
++++ b/tests/phpunit/tests/fonts/font-library/Tests_Fonts_WpFontDir.php
+@@ -45,6 +45,7 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Group('multisite')]
+ 	#[\PHPUnit\Framework\Attributes\Group('ms-required')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_fonts_dir_for_multisite() {
+ 		$blog_id              = self::factory()->blog->create();
+ 		$main_site_upload_dir = wp_get_upload_dir();
+diff --git a/tests/phpunit/tests/multisite/site.php b/tests/phpunit/tests/multisite/site.php
+--- a/tests/phpunit/tests/multisite/site.php
++++ b/tests/phpunit/tests/multisite/site.php
+@@ -560,6 +560,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
+ 		restore_current_blog();
+ 	}
+ 
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_switch_upload_dir() {
+ 		$this->assertTrue( is_main_site() );
+ 
+diff --git a/tests/phpunit/tests/rest-api/WP_REST_Global_Styles_Revisions_Controller_Test.php b/tests/phpunit/tests/rest-api/WP_REST_Global_Styles_Revisions_Controller_Test.php
+--- a/tests/phpunit/tests/rest-api/WP_REST_Global_Styles_Revisions_Controller_Test.php
++++ b/tests/phpunit/tests/rest-api/WP_REST_Global_Styles_Revisions_Controller_Test.php
+@@ -991,6 +991,7 @@ class WP_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_REST_Contr
+ 	 * @covers WP_REST_Global_Styles_Revisions_Controller::prepare_item_for_response
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('64292')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_get_item_preserves_block_style_variations() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
+@@ -1077,6 +1078,7 @@ class WP_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_REST_Contr
+ 	 * @covers WP_REST_Global_Styles_Revisions_Controller::prepare_item_for_response
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('64292')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_multiple_block_variations_are_preserved() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
+@@ -1181,6 +1183,7 @@ class WP_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_REST_Contr
+ 	 * @covers WP_REST_Global_Styles_Revisions_Controller::prepare_item_for_response
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('64292')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_theme_variations_are_registered_for_revisions() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
+@@ -1264,6 +1267,7 @@ class WP_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_REST_Contr
+ 	 * @covers WP_REST_Global_Styles_Revisions_Controller::prepare_item_for_response
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('64292')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_get_items_preserves_block_style_variations() {
+ 		wp_set_current_user( self::$admin_id );
+ 		switch_theme( 'block-theme-child-with-block-style-variations' );
+diff --git a/tests/phpunit/tests/l10n/loadScriptTextdomain.php b/tests/phpunit/tests/l10n/loadScriptTextdomain.php
+--- a/tests/phpunit/tests/l10n/loadScriptTextdomain.php
++++ b/tests/phpunit/tests/l10n/loadScriptTextdomain.php
+@@ -5,5 +5,6 @@
+  */
+ #[\PHPUnit\Framework\Attributes\Group('l10n')]
+ #[\PHPUnit\Framework\Attributes\Group('i18n')]
++#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ #[\PHPUnit\Framework\Attributes\CoversFunction('load_script_textdomain')]
+ class Tests_L10n_LoadScriptTextdomain extends WP_UnitTestCase {
+diff --git a/tests/phpunit/tests/block-supports/layout.php b/tests/phpunit/tests/block-supports/layout.php
+--- a/tests/phpunit/tests/block-supports/layout.php
++++ b/tests/phpunit/tests/block-supports/layout.php
+@@ -761,5 +761,6 @@ class Tests_Block_Supports_Layout extends WP_UnitTestCase {
+ 	 * @covers ::wp_render_layout_support_flag
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('64624')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_layout_support_flag_uses_variation_block_gap_value() {
+ 		switch_theme( 'block-theme' );
+diff --git a/tests/phpunit/tests/media.php b/tests/phpunit/tests/media.php
+--- a/tests/phpunit/tests/media.php
++++ b/tests/phpunit/tests/media.php
+@@ -4232,5 +4232,6 @@ class Tests_Media extends WP_UnitTestCase {
+ 	#[\PHPUnit\Framework\Attributes\Ticket('56930')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('58548')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('58235')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_wp_filter_content_tags_does_not_lazy_load_first_featured_image_in_block_theme() {
+ 		global $_wp_current_template_id, $_wp_current_template_content, $wp_query, $wp_the_query, $post;
+diff --git a/tests/phpunit/tests/query/thePost.php b/tests/phpunit/tests/query/thePost.php
+--- a/tests/phpunit/tests/query/thePost.php
++++ b/tests/phpunit/tests/query/thePost.php
+@@ -88,6 +88,7 @@ class Tests_Query_ThePost extends WP_UnitTestCase {
+ 	 *
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('56992')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_wp_query_with_custom_fields_value_populates_the_global_post() {
+ 		global $wpdb;
+ 		add_filter(

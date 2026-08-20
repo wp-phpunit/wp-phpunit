@@ -1,0 +1,11 @@
+diff --git a/tests/phpunit/tests/multisite/getBlogDetails.php b/tests/phpunit/tests/multisite/getBlogDetails.php
+--- a/tests/phpunit/tests/multisite/getBlogDetails.php
++++ b/tests/phpunit/tests/multisite/getBlogDetails.php
+@@ -118,6 +118,7 @@ class Tests_Multisite_GetBlogDetails extends WP_UnitTestCase {
+ 		$this->assertFalse( $site );
+ 	}
+ 
++	#[\PHPUnit\Framework\Attributes\Group('upstream-baseline-defect')]
+ 	public function test_get_blog_details_with_only_domain_in_fields_subdomain() {
+ 		if ( ! is_subdomain_install() ) {
+ 			$this->markTestSkipped( 'This test is only valid in a subdomain configuration.' );

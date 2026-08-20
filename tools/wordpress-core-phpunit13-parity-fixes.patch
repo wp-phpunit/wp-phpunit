@@ -1,0 +1,264 @@
+diff --git a/tests/phpunit/tests/admin/includesPost.php b/tests/phpunit/tests/admin/includesPost.php
+index bc0835b..f0db361 100644
+--- a/tests/phpunit/tests/admin/includesPost.php
++++ b/tests/phpunit/tests/admin/includesPost.php
+@@ -1178,7 +1178,18 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 				'post_type'  => $post_type,
+ 			)
+ 		);
+-		$this->assertSame( $post_id, post_exists( $title, '', '', $post_type ) );
++		$actual = null;
++		if ( PHP_VERSION_ID >= 80100 ) {
++			$this->assertExpectedPhpDeprecations(
++				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
++				static function () use ( $title, $post_type, &$actual ) {
++					$actual = post_exists( $title, '', '', $post_type );
++				}
++			);
++		} else {
++			$actual = post_exists( $title, '', '', $post_type );
++		}
++		$this->assertSame( $post_id, $actual );
+ 	}
+ 
+ 	/**
+@@ -1195,7 +1206,18 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 				'post_type'  => $post_type,
+ 			)
+ 		);
+-		$this->assertSame( 0, post_exists( $title, '', '', 'post' ) );
++		$actual = null;
++		if ( PHP_VERSION_ID >= 80100 ) {
++			$this->assertExpectedPhpDeprecations(
++				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
++				static function () use ( $title, &$actual ) {
++					$actual = post_exists( $title, '', '', 'post' );
++				}
++			);
++		} else {
++			$actual = post_exists( $title, '', '', 'post' );
++		}
++		$this->assertSame( 0, $actual );
+ 	}
+ 
+ 	/**
+@@ -1214,7 +1236,18 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 				'post_status' => $post_status,
+ 			)
+ 		);
+-		$this->assertSame( $post_id, post_exists( $title, '', '', '', $post_status ) );
++		$actual = null;
++		if ( PHP_VERSION_ID >= 80100 ) {
++			$this->assertExpectedPhpDeprecations(
++				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
++				static function () use ( $title, $post_status, &$actual ) {
++					$actual = post_exists( $title, '', '', '', $post_status );
++				}
++			);
++		} else {
++			$actual = post_exists( $title, '', '', '', $post_status );
++		}
++		$this->assertSame( $post_id, $actual );
+ 	}
+ 
+ 
+@@ -1234,7 +1267,18 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 				'post_status' => $post_status,
+ 			)
+ 		);
+-		$this->assertSame( $post_id, post_exists( $title, '', '', $post_type, $post_status ) );
++		$actual = null;
++		if ( PHP_VERSION_ID >= 80100 ) {
++			$this->assertExpectedPhpDeprecations(
++				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
++				static function () use ( $title, $post_type, $post_status, &$actual ) {
++					$actual = post_exists( $title, '', '', $post_type, $post_status );
++				}
++			);
++		} else {
++			$actual = post_exists( $title, '', '', $post_type, $post_status );
++		}
++		$this->assertSame( $post_id, $actual );
+ 	}
+ 
+ 	/**
+@@ -1253,7 +1297,18 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 				'post_status' => $post_status,
+ 			)
+ 		);
+-		$this->assertSame( 0, post_exists( $title, '', '', '', 'publish' ) );
++		$actual = null;
++		if ( PHP_VERSION_ID >= 80100 ) {
++			$this->assertExpectedPhpDeprecations(
++				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
++				static function () use ( $title, &$actual ) {
++					$actual = post_exists( $title, '', '', '', 'publish' );
++				}
++			);
++		} else {
++			$actual = post_exists( $title, '', '', '', 'publish' );
++		}
++		$this->assertSame( 0, $actual );
+ 	}
+ 
+ 	/**
+@@ -1273,8 +1328,22 @@ class Tests_Admin_IncludesPost extends WP_UnitTestCase {
+ 			)
+ 		);
+ 
+-		$this->assertSame( 0, post_exists( $title, '', '', $post_type, 'draft' ) );
+-		$this->assertSame( 0, post_exists( $title, '', '', 'wp_tests', $post_status ) );
++		$actual = array();
++		if ( PHP_VERSION_ID >= 80100 ) {
++			$this->assertExpectedPhpDeprecations(
++				'~Passing null to parameter \#[0-9]+ \(\$[^)]+\) of type [^ ]+ is deprecated~',
++				static function () use ( $title, $post_type, $post_status, &$actual ) {
++					$actual[] = post_exists( $title, '', '', $post_type, 'draft' );
++					$actual[] = post_exists( $title, '', '', 'wp_tests', $post_status );
++				}
++			);
++		} else {
++			$actual[] = post_exists( $title, '', '', $post_type, 'draft' );
++			$actual[] = post_exists( $title, '', '', 'wp_tests', $post_status );
++		}
++
++		$this->assertSame( 0, $actual[0] );
++		$this->assertSame( 0, $actual[1] );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php b/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php
+index 4f98436..bc6639c 100644
+--- a/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php
++++ b/tests/phpunit/tests/multisite/avoidBlogPagePermalinkCollision.php
+@@ -52,11 +52,8 @@ class Tests_Multisite_AvoidBlogPagePermalinkCollision extends WP_UnitTestCase {
+ 		wp_delete_post( self::$child_page->ID );
+ 	}
+ 
++	#[\PHPUnit\Framework\Attributes\Group('ms-subdirectory-only')]
+ 	public function test_avoid_blog_page_permalink_collision_renames_post_name() {
+-		if ( is_subdomain_install() ) {
+-			$this->markTestSkipped( 'Page/site path collisions only apply to subdirectory networks.' );
+-		}
+-
+ 		$this->assertNotSame( self::$post_and_blog_path, self::$root_page->post_name );
+ 	}
+ 
+diff --git a/tests/phpunit/tests/multisite/getBlogDetails.php b/tests/phpunit/tests/multisite/getBlogDetails.php
+index 22d15e6..7fa075a 100644
+--- a/tests/phpunit/tests/multisite/getBlogDetails.php
++++ b/tests/phpunit/tests/multisite/getBlogDetails.php
+@@ -125,7 +125,7 @@ class Tests_Multisite_GetBlogDetails extends WP_UnitTestCase {
+ 		}
+ 
+ 		$site = get_blog_details( array( 'domain' => 'wordpress.org' ) );
+-		$this->assertEquals( self::$site_ids['wordpress.org/'], $site->blog_id );
++		$this->assertSame( self::$site_ids['wordpress.org/'], $site->blog_id );
+ 	}
+ 
+ 	public function test_get_blog_details_with_only_domain_in_fields_subdirectory() {
+diff --git a/tests/phpunit/tests/query/results.php b/tests/phpunit/tests/query/results.php
+index 39e794a..0dd3e58 100644
+--- a/tests/phpunit/tests/query/results.php
++++ b/tests/phpunit/tests/query/results.php
+@@ -594,6 +594,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
+ 	/**
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('11056')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_query_orderby_post_parent__in() {
+ 		$posts = $this->q->query(
+ 			array(
+@@ -603,14 +604,21 @@ class Tests_Query_Results extends WP_UnitTestCase {
+ 			)
+ 		);
+ 
+-		$titles = wp_list_pluck( $posts, 'post_title' );
+-		$this->assertSameSets( array( 'child-three', 'child-four' ), array_slice( $titles, 0, 2 ) );
+-		$this->assertSameSets( array( 'child-one', 'child-two' ), array_slice( $titles, 2 ) );
++		$this->assertSame(
++			array(
++				'child-three',
++				'child-four',
++				'child-one',
++				'child-two',
++			),
++			wp_list_pluck( $posts, 'post_title' )
++		);
+ 	}
+ 
+ 	/**
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('39055')]
++	#[\PHPUnit\Framework\Attributes\Group('paratest-serial')]
+ 	public function test_query_orderby_post_parent__in_with_order_desc() {
+ 		$post_parent__in_array = array( self::$parent_two, self::$parent_one );
+ 
+@@ -622,11 +630,10 @@ class Tests_Query_Results extends WP_UnitTestCase {
+ 			)
+ 		);
+ 
+-		$titles = wp_list_pluck( $posts, 'post_title' );
++		$expected_returned_array = array( 'child-three', 'child-four', 'child-one', 'child-two' );
+ 
+ 		// 'order=desc' does not influence the order of returned results (returns same order as 'order=asc').
+-		$this->assertSameSets( array( 'child-three', 'child-four' ), array_slice( $titles, 0, 2 ) );
+-		$this->assertSameSets( array( 'child-one', 'child-two' ), array_slice( $titles, 2 ) );
++		$this->assertSame( $expected_returned_array, wp_list_pluck( $posts, 'post_title' ) );
+ 	}
+ 
+ 	/**
+diff --git a/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php b/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php
+index 008d275..06f999b 100644
+--- a/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php
++++ b/tests/phpunit/tests/rest-api/REST_Block_Type_Controller_Test.php
+@@ -755,6 +755,7 @@ class REST_Block_Type_Controller_Test extends WP_Test_REST_Controller_Testcase {
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('47620')]
+ 	#[\PHPUnit\Framework\Attributes\Ticket('56481')]
++	#[\PHPUnit\Framework\Attributes\DataProvider('data_readable_http_methods')]
+ 	public function test_prepare_item() {
+ 		$registry = new WP_Block_Type_Registry();
+ 		$settings = array(
+diff --git a/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php b/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php
+index c5383a1..615dd4f 100644
+--- a/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php
++++ b/tests/phpunit/tests/rest-api/WP_Test_REST_Search_Controller.php
+@@ -363,6 +363,7 @@ class WP_Test_REST_Search_Controller extends WP_Test_REST_Controller_Testcase {
+ 	 *
+ 	 * @param string $method HTTP method to use.
+ 	 */
++	#[\PHPUnit\Framework\Attributes\DataProvider('data_readable_http_methods')]
+ 	public function test_get_items_search_type_post_subtype_invalid() {
+ 		$response = $this->do_request_with_params(
+ 			array(
+diff --git a/tests/phpunit/tests/script-modules/wpScriptModules.php b/tests/phpunit/tests/script-modules/wpScriptModules.php
+index 9ccdd9d..bb35eff 100644
+--- a/tests/phpunit/tests/script-modules/wpScriptModules.php
++++ b/tests/phpunit/tests/script-modules/wpScriptModules.php
+@@ -2521,6 +2521,7 @@ HTML;
+ 	 * @covers WP_Script_Modules::print_script_module_preloads()
+ 	 */
+ 	#[\PHPUnit\Framework\Attributes\Ticket('63486')]
++	#[\PHPUnit\Framework\Attributes\DataProvider('data_test_register_and_enqueue_script_module')]
+ 	public function test_static_import_dependency_with_dynamic_imports_depending_on_static_import_dependency() {
+ 		$get_dependency = function ( string $id, string $import ): array {
+ 			return compact( 'id', 'import' );
+diff --git a/tests/phpunit/tests/block-bindings/wpBlockBindingsRegistry.php b/tests/phpunit/tests/block-bindings/wpBlockBindingsRegistry.php
+index 5e8aa90..889dcfd 100644
+--- a/tests/phpunit/tests/block-bindings/wpBlockBindingsRegistry.php
++++ b/tests/phpunit/tests/block-bindings/wpBlockBindingsRegistry.php
+@@ -63,6 +63,13 @@ class Tests_Blocks_wpBlockBindingsRegistry extends WP_UnitTestCase {
+ 		$this->assertSame( 'Test source', $source->label );
+ 		$this->assertSame( array( 'sourceContext' ), $source->uses_context );
+ 		$this->assertSame( 'test-value', $source->get_value( array(), null, '' ) );
++
++		$reflection = new ReflectionObject( $source );
++		$callback   = $reflection->getProperty( 'get_value_callback' );
++		if ( PHP_VERSION_ID < 80100 ) {
++			$callback->setAccessible( true );
++		}
++		$this->assertSame( self::$test_source_properties['get_value_callback'], $callback->getValue( $source ) );
+ 	}
+ 
+ 	/**

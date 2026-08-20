@@ -1,0 +1,11 @@
+diff --git a/tests/phpunit/tests/oembed/controller.php b/tests/phpunit/tests/oembed/controller.php
+--- a/tests/phpunit/tests/oembed/controller.php
++++ b/tests/phpunit/tests/oembed/controller.php
+@@ -50,6 +50,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
+ 		global $wp_rest_server;
+ 		$wp_rest_server = new Spy_REST_Server();
+ 		do_action( 'rest_api_init', $wp_rest_server );
++		wp_scripts();
+ 
+ 		add_filter( 'pre_http_request', array( $this, 'mock_embed_request' ), 10, 3 );
+ 		add_filter( 'oembed_result', array( $this, 'filter_oembed_result' ), 10, 3 );
